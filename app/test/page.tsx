@@ -1,3 +1,4 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/options'
 import { auth } from '@/lib/auth'
 
 export default async function Home() {
