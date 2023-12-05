@@ -31,7 +31,7 @@ export default function Profile() {
   })
 
   return (
-    <div className="relative" ref={inside}>
+    <div className="relative inline" ref={inside}>
       <button onClick={toggle} aria-expanded={on}>
         <Avatar />
       </button>

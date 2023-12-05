@@ -21,11 +21,15 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <AuthContext>
-          <header className="flex justify-end">
-            <Profile />
-          </header>
-          <Sidebar />
-          {children}
+          <div className="min-h-screen bg-neutral-100">
+            <header className="flex justify-end h-[60px] items-center px-5">
+              <Profile />
+            </header>
+            <div className="flex min-h-[calc(100vh-60px)] gap-1">
+              <Sidebar />
+              <div className="flex-1">{children}</div>
+            </div>
+          </div>
         </AuthContext>
       </body>
     </html>
