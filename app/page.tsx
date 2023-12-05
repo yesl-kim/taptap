@@ -1,6 +1,3 @@
-import { auth } from '@/lib/auth'
-
 export default async function Home() {
-  const session = await auth()
-  return <main>{JSON.stringify(session)}</main>
+  return <main>main</main>
 }
