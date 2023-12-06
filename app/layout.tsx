@@ -14,8 +14,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode
+  modal: React.ReactNode
 }) {
   return (
     <html lang="ko">
@@ -27,7 +29,10 @@ export default function RootLayout({
             </header>
             <div className="flex min-h-[calc(100vh-60px)] gap-1">
               <Sidebar />
-              <div className="flex-1">{children}</div>
+              <div className="flex-1">
+                {children}
+                {modal}
+              </div>
             </div>
           </div>
         </AuthContext>
