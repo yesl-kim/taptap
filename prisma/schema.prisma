@@ -73,10 +73,8 @@ model Task {
   updatedAt  DateTime @updatedAt
   title     String
   color     String
-  startDate DateTime?  @default(now())
-  times    Json?     // [시작시간, 종료시간][] format: hh:mm (24hours)
   // description String?
-  repeat     Repeat?
+  repeat     Repeat[]
   records   Record[]
 
   categoryId String
@@ -108,14 +106,18 @@ model Repeat {
   id    String     @id @default(cuid())
   createdAt  DateTime  @default(now())
   updatedAt  DateTime @updatedAt
+  
+  startDate DateTime  @default(now())
   endDate DateTime?
-  type  RepeatType
-  interval  Int
+  times    Json?     // [시작시간, 종료시간][] format: hh:mm (24hours)
+  
+  type  RepeatType? // None = 반복안함
+  interval  Int? // 주기
   months  Int[]
   daysOfMonth Int[] // 몇일 1 ~ 31
   weekOfMonth Int? // 몇째주
   daysOfWeek Int[] // 몇요일 sun(0) to sat(6)
 
-  taskId  String @unique
+  taskId  String
   task  Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
