@@ -11,7 +11,6 @@ import { createCategory } from '../actions'
 
 export default function NewCategory() {
   const [state, formAction] = useFormState(createCategory, null)
-  console.log('state: ', state)
 
   return (
     <form action={formAction}>
