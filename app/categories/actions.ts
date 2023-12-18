@@ -55,11 +55,12 @@ export const createCategory = async (_: any, formData: FormData) => {
     })
 
     revalidatePath('/categories')
-    return { message: '카테고리가 생성되었습니다~' }
+    return { message: '카테고리가 성공적으로 생성되었습니다.' }
   } catch (e) {
     console.log('error: ', e)
     return {
-      message: '이런, 카테고리 생성에 실패하였습니다! 다시 시도해주세요.',
+      message:
+        '이런, 카테고리 생성에 실패하였습니다! 잠시 후 다시 시도해주세요.',
     }
   }
 }
