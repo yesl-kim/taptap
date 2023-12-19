@@ -58,13 +58,14 @@ model VerificationToken {
 model Category {
   id    String     @id @default(cuid())
   createdAt  DateTime  @default(now())
+  updatedAt DateTime   @updatedAt
   title       String
   tasks   Task[]
 
-  userId  String
-  user User @relation(fields: [userId], references: [id])
+  owner  String
+  user User @relation(fields: [owner], references: [email])
 
-  @@unique([userId, title])
+  @@unique([owner, title])
 }
 
 model Task {
