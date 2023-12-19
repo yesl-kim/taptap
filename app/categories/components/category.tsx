@@ -28,7 +28,7 @@ function Category({ id, title }: Props) {
     if (!confirmed) return
 
     const res = await deleteCategory(id)
-    if (res?.message) {
+    if (!res?.ok) {
       alert(res?.message)
     }
   }, [id])
@@ -53,6 +53,9 @@ function Category({ id, title }: Props) {
         className="outline-none bg-transparent focus:border-b-[1px] border-b-neutral-400"
       />
       <EditButton {...{ focused, focus }} />
+      <p aria-live="polite" role="status" className="sr-only">
+        {state?.message}
+      </p>
     </form>
   )
 }

@@ -21,44 +21,69 @@ const authenticate = async (id: string) => {
   }
 }
 
-// TODO: zod로 타입 체킹?
 export const createCategory = async (_: any, formData: FormData) => {
-  const session = await auth()
-  if (!session?.user?.email) {
-    return { message: '로그인이 필요한 서비스입니다.' }
-  }
+  const schema = z
+    .object({
+      title: z.string().min(1),
+    })
+    .transform(async (data, ctx) => {
+      const session = await auth()
+      if (!session?.user?.email) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '로그인이 필요한 서비스입니다.',
+        })
+        return z.NEVER
+      }
 
-  const schema = z.object({
-    title: z.string().min(1),
-  })
+      const prevCategory = await prisma.category.findUnique({
+        where: {
+          owner_title: {
+            owner: session.user.email,
+            title: data.title,
+          },
+        },
+      })
+      if (prevCategory) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '카테고리가 이미 존재합니다.',
+        })
+        return z.NEVER
+      }
 
-  const parse = schema.safeParse({
+      return { ...data, session }
+    })
+
+  const parse = await schema.spa({
     title: formData.get('title'),
   })
 
   if (!parse.success) {
-    return { message: '입력값을 확인해주세요.' }
+    const formatted = parse.error.format()
+    return { ok: false, message: formatted?._errors[0] }
   }
 
-  const data = parse.data
+  const { title, session } = parse.data
 
   try {
     await prisma.category.create({
       data: {
-        title: data.title,
+        title,
         user: {
           connect: {
-            email: session.user?.email,
+            email: session.user?.email as string,
           },
         },
       },
     })
 
     revalidatePath('/categories')
-    return { message: '카테고리가 성공적으로 생성되었습니다.' }
+    return { ok: true, message: '카테고리가 성공적으로 생성되었습니다.' }
   } catch (e) {
     console.log('error: ', e)
     return {
+      ok: false,
       message:
         '이런, 카테고리 생성에 실패하였습니다! 잠시 후 다시 시도해주세요.',
     }
@@ -104,10 +129,11 @@ export const deleteCategory = async (id: string) => {
     await authenticate(id)
     await prisma.category.delete({ where: { id } })
     revalidatePath('/categories')
-    return { message: '카테고리가 삭제되었습니다~' }
+    return { ok: true }
   } catch (e) {
     console.log('error: ', e)
     return {
+      ok: false,
       message: '이런, 카테고리 삭제에 실패하였습니다! 다시 시도해주세요.',
     }
   }

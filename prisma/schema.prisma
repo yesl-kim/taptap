@@ -62,10 +62,10 @@ model Category {
   title       String
   tasks   Task[]
 
-  userId  String
-  user User @relation(fields: [userId], references: [id])
+  owner  String
+  user User @relation(fields: [owner], references: [email])
 
-  @@unique([userId, title])
+  @@unique([owner, title])
 }
 
 model Task {

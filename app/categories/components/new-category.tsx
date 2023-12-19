@@ -23,34 +23,48 @@ function NewCategory() {
   const [state, formAction] = useFormState(submit, null)
 
   return (
-    <form
-      action={formAction}
-      ref={formRef}
-      className="flex gap-4 items-center mb-3"
-    >
-      <InputController focus={focus} focused={focused} />
-      <input
-        type="text"
-        name="title"
-        aria-label="새 카테고리 생성"
-        placeholder="새 카테고리 생성"
-        required
-        ref={inputRef}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        className="outline-none bg-transparent focus:border-b-[1px] border-b-neutral-400"
-      />
-      {focused && (
-        <IconButton
-          type="submit"
+    <div className="mb-3">
+      <form
+        action={formAction}
+        ref={formRef}
+        className="flex gap-4 items-center"
+      >
+        <InputController focus={focus} focused={focused} />
+        <input
+          type="text"
+          name="title"
           aria-label="새 카테고리 생성"
-          Icon={CheckIcon}
+          placeholder="새 카테고리 생성"
+          required
+          ref={inputRef}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          className="outline-none bg-transparent focus:border-b-[1px] border-b-neutral-400"
         />
+        {focused && (
+          <IconButton
+            type="submit"
+            aria-label="새 카테고리 생성"
+            Icon={CheckIcon}
+          />
+        )}
+      </form>
+      {state?.ok ? (
+        <p aria-live="polite" role="status" className="sr-only">
+          {state.message}
+        </p>
+      ) : (
+        state && (
+          <p
+            aria-live="polite"
+            role="status"
+            className="text-sm text-red-600 pl-2"
+          >
+            {state.message}
+          </p>
+        )
       )}
-      <p aria-live="polite" role="status" className="sr-only">
-        {state?.message}
-      </p>
-    </form>
+    </div>
   )
 }
 
