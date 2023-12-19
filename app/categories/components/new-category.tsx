@@ -7,6 +7,8 @@ import { createCategory } from '../actions'
 import { PlusIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline'
 import useBoolean from '@/lib/useBoolean'
 
+import IconButton, { style } from '@/components/icon-button'
+
 function NewCategory() {
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -21,7 +23,11 @@ function NewCategory() {
   const [state, formAction] = useFormState(submit, null)
 
   return (
-    <form action={formAction} ref={formRef} className="flex gap-2 items-center">
+    <form
+      action={formAction}
+      ref={formRef}
+      className="flex gap-4 items-center mb-3"
+    >
       <InputController focus={focus} focused={focused} />
       <input
         type="text"
@@ -29,12 +35,18 @@ function NewCategory() {
         aria-label="새 카테고리 생성"
         placeholder="새 카테고리 생성"
         required
-        className="peer"
         ref={inputRef}
         onFocus={onFocus}
         onBlur={onBlur}
+        className="outline-none bg-transparent focus:border-b-[1px] border-b-neutral-400"
       />
-      {focused && <SubmitButton />}
+      {focused && (
+        <IconButton
+          type="submit"
+          aria-label="새 카테고리 생성"
+          Icon={CheckIcon}
+        />
+      )}
       <p aria-live="polite" role="status" className="sr-only">
         {state?.message}
       </p>
@@ -47,11 +59,6 @@ export default memo(NewCategory)
 interface InputControllerProps {
   focused: boolean
   focus: () => void
-}
-
-const style = {
-  iconButton: 'w-[30px] p-1.5 group hover:bg-slate-200 rounded-full',
-  icon: 'group-hover:stroke-black stroke-slate-500 stroke-2',
 }
 
 function InputController({ focused, focus }: InputControllerProps) {
@@ -71,21 +78,6 @@ function InputController({ focused, focus }: InputControllerProps) {
       onClick={focus}
     >
       <PlusIcon aria-hidden className={style.icon} />
-    </button>
-  )
-}
-
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <button
-      type="submit"
-      aria-label="새 카테고리 생성"
-      aria-disabled={pending}
-      className={style.iconButton}
-    >
-      <CheckIcon aria-hidden className={style.icon} />
     </button>
   )
 }

@@ -12,6 +12,9 @@ export default async function CategoriesPage() {
         email: session?.user?.email,
       },
     },
+    orderBy: {
+      createdAt: 'asc',
+    },
   })
 
   return (
