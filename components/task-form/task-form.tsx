@@ -1,5 +1,7 @@
+import { createTask } from '@/app/timer/actions/create-task'
 import ColorField from './components/color-field'
 import RepeatField from './components/repeat-field'
+import CategoryField from './components/category-field'
 
 // TODO: field 추가 - 제목, 카테고리, 색상, 시작일, 반복설정
 // TODO: 각 필드 컴포넌트 분리
@@ -17,29 +19,33 @@ import RepeatField from './components/repeat-field'
 // color filed -----
 export default function TaskForm() {
   return (
-    <form>
+    <form action={createTask}>
       <label>
         <span>제목</span>
         <input name="title" required />
       </label>
 
-      <fieldset>
+      {/* <fieldset>
         <legend>카테고리</legend>
         <select name="categoryId" required>
           <option value="">카테고리</option>
           <option value={1}>카테고리 test1</option>
           <option value={2}>카테고리 test2</option>
         </select>
-      </fieldset>
+      </fieldset> */}
 
-      <ColorField />
+      <div className="flex gap-2 items-center">
+        <CategoryField />
+        <ColorField />
+      </div>
 
-      <label>
+      {/* <label>
         <span>시작일</span>
         <input type="datetime-local" />
       </label>
 
-      <RepeatField />
+      <RepeatField /> */}
+      <button>완료</button>
     </form>
   )
 }

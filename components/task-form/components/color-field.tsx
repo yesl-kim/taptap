@@ -121,7 +121,7 @@ export default function ColorField() {
           autoFocus
           role="listbox"
           id="color-select-field"
-          className="absolute top-0 left-0 shadow-md flex w-[62px] flex-wrap py-3 gap-2 justify-center rounded-md bg-white"
+          className="absolute shadow-md flex w-[62px] flex-wrap py-3 gap-2 justify-center rounded-md bg-white"
         >
           {options.map((color, idx) => (
             <li
