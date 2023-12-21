@@ -1,6 +1,6 @@
 import { createTask } from '@/app/timer/actions/create-task'
 import ColorField from './components/color-field'
-import RepeatField from './components/repeat-field'
+import RepeatField from './components/repeat-field/repeat-field'
 import CategoryField from './components/category-field'
 import prisma from '@/lib/prisma'
 
