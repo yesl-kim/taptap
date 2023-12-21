@@ -22,7 +22,7 @@ export default function CategoryField() {
             </>
           )}
         </Listbox.Button>
-        <Listbox.Options className="absolute max-h-60 p-1 overflow-auto rounded-md bg-white text-base shadow-lg focus:outline-none sm:text-sm z-10">
+        <Listbox.Options className="absolute max-h-60 py-2 overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-10 sm:text-sm">
           {DATA.map((category) => (
             <Listbox.Option
               key={category.id}

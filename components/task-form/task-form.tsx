@@ -2,6 +2,7 @@ import { createTask } from '@/app/timer/actions/create-task'
 import ColorField from './components/color-field'
 import RepeatField from './components/repeat-field'
 import CategoryField from './components/category-field'
+import prisma from '@/lib/prisma'
 
 // TODO: field 추가 - 제목, 카테고리, 색상, 시작일, 반복설정
 // TODO: 각 필드 컴포넌트 분리
@@ -12,39 +13,22 @@ import CategoryField from './components/category-field'
 // TODO: 상수 or 기본값 관리
 
 // category field ------
-// TODO: 카테고리 조회
+// TODO: 카테고리 조회 -> 내 것만 가져오도록, util로 수정
 // TODO: 카테고리 추가 버튼 -> 카테고리 추가 모달 연결
 // TODO: 카테고리가 없을 경우
 
 // color filed -----
-export default function TaskForm() {
+export default async function TaskForm() {
   return (
     <form action={createTask}>
-      <label>
-        <span>제목</span>
-        <input name="title" required />
-      </label>
-
-      {/* <fieldset>
-        <legend>카테고리</legend>
-        <select name="categoryId" required>
-          <option value="">카테고리</option>
-          <option value={1}>카테고리 test1</option>
-          <option value={2}>카테고리 test2</option>
-        </select>
-      </fieldset> */}
+      <input name="title" required placeholder="제목" />
 
       <div className="flex gap-2 items-center">
         <CategoryField />
         <ColorField />
       </div>
 
-      {/* <label>
-        <span>시작일</span>
-        <input type="datetime-local" />
-      </label>
-
-      <RepeatField /> */}
+      <RepeatField />
       <button>완료</button>
     </form>
   )
