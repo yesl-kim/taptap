@@ -2,21 +2,55 @@
 
 import { useState } from 'react'
 import { Switch } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { CheckIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
 import TimeField from './time-field'
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 
+interface DateForm {
+  times: [string[]]
+}
 export default function DateField() {
   const [allday, setAllday] = useState(false)
+  const formMethod = useForm<DateForm>({
+    defaultValues: {
+      times: [[]],
+    },
+  })
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
+    {
+      control: formMethod.control, // control props comes from useForm (optional: if you are using FormContext)
+      name: 'times', // unique name for your Field Array
+    }
+  )
+  console.log(formMethod.watch('times'))
+
   return (
-    <div>
-      <div className="flex gap-2 mb-2">
+    <FormProvider {...formMethod}>
+      <div className="flex gap-2 mb-2 items-start">
         <input type="date" name="startDate" />
-        {!allday && (
-          <TimeField
-            start={new Date('2023-12-21 9:00')}
-            end={new Date('2023-12-21 23:31')}
+        <div>
+          {!allday &&
+            fields.map((field, index) => (
+              <TimeField
+                key={field.id}
+                name={`times.${index}`}
+                start={new Date('2023-12-21 9:00')}
+                end={new Date('2023-12-21 23:31')}
+              />
+            ))}
+        </div>
+        <div
+          role="button"
+          aria-label="시간 추가"
+          onClick={() => append([''])}
+          className="w-[22px]"
+        >
+          <PlusCircleIcon
+            aria-hidden
+            className="text-base text-neutral-600"
+            strokeWidth={2}
           />
-        )}
+        </div>
       </div>
       <Switch
         checked={allday}
@@ -36,6 +70,6 @@ export default function DateField() {
         </div>
         <span>종일</span>
       </Switch>
-    </div>
+    </FormProvider>
   )
 }
