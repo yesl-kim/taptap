@@ -4,6 +4,7 @@ import { Listbox } from '@headlessui/react'
 
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 
+// mock data
 const DATA = [
   { id: 1, title: 'category 1' },
   { id: 2, title: 'category 2' },

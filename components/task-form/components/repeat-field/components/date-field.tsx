@@ -9,20 +9,24 @@ import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 interface DateForm {
   times: [string[]]
 }
+
+// FIXME: times type [[start, end]] -> [{start, end}]
+// TODO: 종일 switch 컴포넌트 분리
 export default function DateField() {
   const [allday, setAllday] = useState(false)
   const formMethod = useForm<DateForm>({
     defaultValues: {
       times: [[]],
     },
+    mode: 'onChange',
   })
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control: formMethod.control, // control props comes from useForm (optional: if you are using FormContext)
-      name: 'times', // unique name for your Field Array
-    }
-  )
-  console.log(formMethod.watch('times'))
+  const { control, watch } = formMethod
+  const { fields, append } = useFieldArray({
+    control,
+    name: 'times',
+  })
+
+  const timeFields = watch('times')
 
   return (
     <FormProvider {...formMethod}>
@@ -34,8 +38,12 @@ export default function DateField() {
               <TimeField
                 key={field.id}
                 name={`times.${index}`}
-                start={new Date('2023-12-21 9:00')}
-                end={new Date('2023-12-21 23:31')}
+                start={
+                  index > 0
+                    ? new Date(timeFields[index - 1][1])
+                    : new Date('2023-12-21 9:00')
+                }
+                end={new Date('2023-12-21 24:00')}
               />
             ))}
         </div>
