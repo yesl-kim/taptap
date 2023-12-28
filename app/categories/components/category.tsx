@@ -16,6 +16,7 @@ interface Props {
 
 function Category({ id, title }: Props) {
   const [state, update] = useFormState(updateCategory, null)
+  const { pending } = useFormStatus()
 
   const inputRef = useRef<HTMLInputElement>(null)
   const focus = useCallback(() => inputRef?.current?.focus(), [])
@@ -37,9 +38,10 @@ function Category({ id, title }: Props) {
     <form action={update} className="flex gap-4 items-center mb-3">
       <IconButton
         type="button"
-        aria-label="카테고리 삭제"
+        label="카테고리 삭제"
         Icon={TrashIcon}
         onClick={onDelete}
+        disabled={pending}
       />
       <input type="hidden" name="id" value={id} />
       <input
@@ -66,15 +68,22 @@ interface EditButtonProps {
 }
 
 function EditButton({ focused, focus }: EditButtonProps) {
+  const { pending } = useFormStatus()
   return focused ? (
-    <IconButton Icon={CheckIcon} aria-label="카테고리 수정" key="submit" />
+    <IconButton
+      key="submit"
+      Icon={CheckIcon}
+      label="카테고리 이름 변경"
+      disabled={pending}
+    />
   ) : (
     <IconButton
-      Icon={PencilIcon}
-      type="button"
-      aria-label="카테고리 수정"
-      onClick={focus}
       key="edit"
+      type="button"
+      Icon={PencilIcon}
+      label="카테고리 이름 변경"
+      onClick={focus}
+      disabled={pending}
     />
   )
 }

@@ -22,26 +22,39 @@ interface Props
       titleId?: string | undefined
     } & React.RefAttributes<SVGSVGElement>
   >
+  label: string
+  'aria-label'?: string
 }
 
+// aria 속성을 라벨로 받고 싶다면
+// https://stackoverflow.com/questions/73887723/enforce-mutually-exclusive-aria-label-attributes-via-types-and-modify-the-props
 export const style = {
-  iconButton: 'w-[30px] p-1.5 group hover:bg-neutral-200 rounded-full',
+  iconButton: 'w-[30px] p-1.5 group hover:bg-neutral-200 rounded-full peer',
   icon: 'group-hover:text-neutral-900 text-neutral-500 stroke-2',
 }
 
 const IconButton = forwardRef<HTMLButtonElement, Props>(
-  function IconButtonComponent({ className, Icon, ...buttonProps }, ref) {
-    const { pending } = useFormStatus()
-
+  function IconButtonComponent(
+    { className, Icon, label, ...buttonProps },
+    ref
+  ) {
     return (
-      <button
-        ref={ref}
-        aria-disabled={pending}
-        className={`${style.iconButton} ${className}`}
-        {...buttonProps}
-      >
-        <Icon aria-hidden className={style.icon} />
-      </button>
+      <div className="relative">
+        <button
+          ref={ref}
+          aria-label={label}
+          className={`${style.iconButton} ${className}`}
+          {...buttonProps}
+        >
+          <Icon aria-hidden className={style.icon} />
+        </button>
+        <div
+          aria-hidden
+          className="absolute left-[50%] top-[100%] -translate-x-[50%] w-auto z-10 bg-black/70 py-1 px-2 rounded-md text-white text-xs whitespace-nowrap hidden peer-hover:block"
+        >
+          {label}
+        </div>
+      </div>
     )
   }
 )

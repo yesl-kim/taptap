@@ -41,13 +41,7 @@ function NewCategory() {
           onBlur={onBlur}
           className="outline-none bg-transparent focus:border-b-[1px] border-b-neutral-400"
         />
-        {focused && (
-          <IconButton
-            type="submit"
-            aria-label="새 카테고리 생성"
-            Icon={CheckIcon}
-          />
-        )}
+        {focused && <SubmitButton />}
       </form>
       {state?.ok ? (
         <p aria-live="polite" role="status" className="sr-only">
@@ -77,21 +71,26 @@ interface InputControllerProps {
 
 function InputController({ focused, focus }: InputControllerProps) {
   return focused ? (
-    <button
-      type="reset"
-      aria-label="카테고리 추가 취소"
-      className={style.iconButton}
-    >
-      <XMarkIcon aria-hidden className={style.icon} />
-    </button>
+    <IconButton type="reset" key="reset" label="취소" Icon={XMarkIcon} />
   ) : (
-    <button
+    <IconButton
+      key="add"
       type="button"
-      aria-label="새 카테고리 생성"
-      className={style.iconButton}
+      label="카테고리 만들기"
       onClick={focus}
-    >
-      <PlusIcon aria-hidden className={style.icon} />
-    </button>
+      Icon={PlusIcon}
+    ></IconButton>
+  )
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <IconButton
+      type="submit"
+      label="카테고리 만들기"
+      Icon={CheckIcon}
+      disabled={pending}
+    />
   )
 }
