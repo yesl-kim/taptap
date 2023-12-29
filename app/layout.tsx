@@ -4,6 +4,7 @@ import './globals.css'
 import AuthContext from './auth-context'
 import Sidebar from '@/components/sidebar/sidebar'
 import Profile from '@/components/profile/profile'
+import { TodayContextProvider } from '@/lib/useToday'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,15 +22,17 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <AuthContext>
-          <div className="min-h-screen bg-neutral-100">
-            <header className="flex justify-end h-[60px] items-center px-5">
-              <Profile />
-            </header>
-            <div className="flex min-h-[calc(100vh-60px)] gap-1">
-              <Sidebar />
-              <div className="flex-1">{children}</div>
+          <TodayContextProvider>
+            <div className="min-h-screen bg-neutral-100">
+              <header className="flex justify-end h-[60px] items-center px-5">
+                <Profile />
+              </header>
+              <div className="flex min-h-[calc(100vh-60px)] gap-1">
+                <Sidebar />
+                <div className="flex-1">{children}</div>
+              </div>
             </div>
-          </div>
+          </TodayContextProvider>
         </AuthContext>
       </body>
     </html>

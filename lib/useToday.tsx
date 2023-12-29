@@ -9,13 +9,22 @@ import React, {
   useState,
 } from 'react'
 
-import { addDays, differenceInMilliseconds, sub, set } from 'date-fns'
+import {
+  addDays,
+  differenceInMilliseconds,
+  sub,
+  set,
+  startOfDay,
+  endOfDay,
+  add,
+} from 'date-fns'
 
 interface TodayContextType {
   today: Date
-  customStartOfDay: (date: Date) => Date
   offset: number
   setOffset: (hour: number) => void
+  getStartOfDay: (date: Date) => Date
+  getEndOfDay: (date: Date) => Date
 }
 
 const DEFAULT_OFFSET = 4 // 하루의 시작은 4시. 추후 사용자 설정 가능
@@ -27,36 +36,48 @@ export const TodayContextProvider = ({
   children: React.ReactNode
 }) => {
   const [offset, setOffset] = useState(DEFAULT_OFFSET)
-  const customStartOfDay = useCallback(
+  const getStartOfDay = useCallback(
     // 하루의 시작 시간으로 맞춤
     (date: Date) =>
-      set(date, {
+      add(startOfDay(sub(date, { hours: DEFAULT_OFFSET })), {
         hours: offset,
-        minutes: 0,
-        seconds: 0,
-        milliseconds: 0,
       }),
     [offset]
   )
 
-  const [today, setToday] = useState(
-    customStartOfDay(sub(new Date(), { hours: DEFAULT_OFFSET }))
+  const getEndOfDay = useCallback(
+    (date: Date) =>
+      add(endOfDay(sub(date, { hours: DEFAULT_OFFSET })), {
+        hours: offset,
+      }),
+    [offset]
   )
+
+  const [today, setToday] = useState(getStartOfDay(new Date()))
+
   useEffect(() => {
-    const tomorrow = customStartOfDay(addDays(today, 1))
+    const tomorrow = getStartOfDay(addDays(today, 1))
     const delay = differenceInMilliseconds(tomorrow, new Date())
     const id = setTimeout(() => setToday(tomorrow), delay)
     return () => clearTimeout(id)
-  }, [today, customStartOfDay])
+  }, [today, getStartOfDay])
 
   const value = useMemo(
-    () => ({ today, customStartOfDay, offset, setOffset }),
-    [today, offset, customStartOfDay]
+    () => ({ today, getStartOfDay, offset, setOffset, getEndOfDay }),
+    [today, offset, getStartOfDay, getEndOfDay]
   )
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>
 }
 
-const useToday = () => useContext(TodayContext)
+const useToday = (): TodayContextType => {
+  const context = useContext(TodayContext)
+
+  if (!context) {
+    throw new Error('today context not found')
+  }
+
+  return context
+}
 
 export default useToday
