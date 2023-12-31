@@ -1,8 +1,9 @@
 import { useFormContext, Controller } from 'react-hook-form'
 import TimeSelect from './TimeSelect'
-import { addHours, addMinutes, isBefore, isSameMinute } from 'date-fns'
-import { useEffect, useMemo } from 'react'
+import { addHours, addMinutes, format, isBefore, isSameMinute } from 'date-fns'
+import { useEffect, useMemo, useState } from 'react'
 import { round30Minutes } from '@/lib/datetime'
+import { nestedValue } from '@/lib/parser'
 
 export type PeriodData = {
   start: Date
@@ -25,16 +26,25 @@ const PeriodField = ({ name, range }: Props) => {
   const defaultValue = useMemo(() => getDefaultValue(range), [range])
   const value = watch(name, defaultValue)
 
+  const validateStart = (v: Date) =>
+    isBefore(range.start, v) ||
+    isSameMinute(range.start, v) ||
+    '기간은 겹칠 수 없습니다?.'
+
+  const [prevRange, setPrevRange] = useState(range)
+  if (!isSameMinute(prevRange.start, range.start)) {
+    setPrevRange(range)
+    trigger(`${name}.start`)
+  }
+
   const endRange = useMemo(
     () => ({ start: addMinutes(value.start, 1), end: range.end }),
     [value, range]
   )
-  // range.start <= value.start < value.end
-  // value.start < range.start
-  console.log('value', value)
 
   const errorMessage =
-    errors[name]?.start?.message || errors[name]?.end?.message
+    nestedValue(`${name}.start.message`, errors) ||
+    nestedValue(`${name}.end.message`, errors)
 
   return (
     <div>
@@ -44,10 +54,7 @@ const PeriodField = ({ name, range }: Props) => {
           control={control}
           rules={{
             required: true,
-            validate: (v) =>
-              isBefore(range.start, v) ||
-              isSameMinute(range.start, v) ||
-              '기간은 겹칠 수 없습니다.',
+            validate: validateStart,
           }}
           defaultValue={defaultValue.start}
           render={({ field: { ref, onChange, ...props } }) => (
@@ -58,7 +65,7 @@ const PeriodField = ({ name, range }: Props) => {
                 onChange(e)
                 trigger(`${name}.end`, { shouldFocus: true })
               }}
-              valid={!errors[name]?.start}
+              valid={!nestedValue(`${name}.start`, errors)}
             />
           )}
         />
@@ -79,7 +86,7 @@ const PeriodField = ({ name, range }: Props) => {
             <TimeSelect
               {...props}
               range={endRange}
-              valid={!errors[name]?.end}
+              valid={!nestedValue(`${name}.end`, errors)}
             />
           )}
         />
