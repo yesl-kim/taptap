@@ -1,0 +1,100 @@
+import { useFormContext, Controller } from 'react-hook-form'
+import TimeSelect from './TimeSelect'
+import { addHours, addMinutes, isBefore, isSameMinute } from 'date-fns'
+import { useEffect, useMemo } from 'react'
+import { round30Minutes } from '@/lib/datetime'
+
+export type PeriodData = {
+  start: Date
+  end: Date
+}
+
+interface Props {
+  name: string
+  range: PeriodData
+}
+
+const PeriodField = ({ name, range }: Props) => {
+  const {
+    control,
+    formState: { errors },
+    watch,
+    trigger,
+  } = useFormContext()
+
+  const defaultValue = useMemo(() => getDefaultValue(range), [range])
+  const value = watch(name, defaultValue)
+
+  const endRange = useMemo(
+    () => ({ start: addMinutes(value.start, 1), end: range.end }),
+    [value, range]
+  )
+  // range.start <= value.start < value.end
+  // value.start < range.start
+  console.log('value', value)
+
+  const errorMessage =
+    errors[name]?.start?.message || errors[name]?.end?.message
+
+  return (
+    <div>
+      <div className="flex gap-2 items-center">
+        <Controller
+          name={`${name}.start`}
+          control={control}
+          rules={{
+            required: true,
+            validate: (v) =>
+              isBefore(range.start, v) ||
+              isSameMinute(range.start, v) ||
+              '기간은 겹칠 수 없습니다.',
+          }}
+          defaultValue={defaultValue.start}
+          render={({ field: { ref, onChange, ...props } }) => (
+            <TimeSelect
+              {...props}
+              range={range}
+              onChange={(e) => {
+                onChange(e)
+                trigger(`${name}.end`, { shouldFocus: true })
+              }}
+              valid={!errors[name]?.start}
+            />
+          )}
+        />
+        <span className="p-2" aria-hidden>
+          -
+        </span>
+        <Controller
+          name={`${name}.end`}
+          control={control}
+          rules={{
+            required: true,
+            validate: (v) =>
+              isBefore(value.start, v) ||
+              '시작 시간은 종료 시간 이전이어야 합니다.',
+          }}
+          defaultValue={defaultValue.end}
+          render={({ field: { ref, ...props } }) => (
+            <TimeSelect
+              {...props}
+              range={endRange}
+              valid={!errors[name]?.end}
+            />
+          )}
+        />
+      </div>
+      {errorMessage && (
+        <p className="ml-3 pt-1 text-xs text-red-600">{errorMessage}</p>
+      )}
+    </div>
+  )
+}
+
+export default PeriodField
+
+const getDefaultValue = (range: PeriodData): PeriodData => {
+  const start = addHours(round30Minutes(range.start), 1)
+  const end = addHours(start, 1)
+  return { start, end }
+}
