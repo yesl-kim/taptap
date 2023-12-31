@@ -33,8 +33,7 @@ const PeriodField = ({ name, range }: Props) => {
 
   const [prevRange, setPrevRange] = useState(range)
   if (!isSameMinute(prevRange.start, range.start)) {
-    setPrevRange(range)
-    trigger(`${name}.start`)
+    trigger(`${name}.start`).finally(() => setPrevRange(range))
   }
 
   const endRange = useMemo(
