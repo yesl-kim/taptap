@@ -26,11 +26,6 @@ const PeriodField = ({ name, range }: Props) => {
   const defaultValue = useMemo(() => getDefaultValue(range), [range])
   const value = watch(name, defaultValue)
 
-  const validateStart = (v: Date) =>
-    isBefore(range.start, v) ||
-    isSameMinute(range.start, v) ||
-    '기간은 겹칠 수 없습니다?.'
-
   const [prevRange, setPrevRange] = useState(range)
   if (!isSameMinute(prevRange.start, range.start)) {
     trigger(`${name}.start`).finally(() => setPrevRange(range))
@@ -53,7 +48,10 @@ const PeriodField = ({ name, range }: Props) => {
           control={control}
           rules={{
             required: true,
-            validate: validateStart,
+            validate: (v: Date) =>
+              isBefore(range.start, v) ||
+              isSameMinute(range.start, v) ||
+              '기간은 겹칠 수 없습니다.',
           }}
           defaultValue={defaultValue.start}
           render={({ field: { ref, onChange, ...props } }) => (

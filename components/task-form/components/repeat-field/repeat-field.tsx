@@ -5,14 +5,13 @@ import { format, getDay, setDay } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { useState } from 'react'
 import StyledSelectButton from '../styled-select-button'
-import DateField from './components/date-field'
 
 const weekdays = Array.from({ length: 7 }).map((_, i) => setDay(new Date(), i))
 
 // 1. 반복 안함 -> 날짜 직접 추가
 // 2. 매주 반복 -> 요일별 시간 추가
 const options = [
-  { name: '반복 안함', value: null, field: <DateField /> },
+  { name: '반복 안함', value: null, field: <div>반복 안함 field</div> },
   { name: '매주 반복', value: 'weekly', field: <div>매주 반복 field</div> },
 ]
 
