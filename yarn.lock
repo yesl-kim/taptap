@@ -70,6 +70,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.55.0.tgz#b721d52060f369aa259cf97392403cb9ce892ec6"
   integrity sha512-qQfo2mxH5yVom1kacMtZZJFVdW+E70mqHMJvVg6WTLo+VBuQJ4TojZlfWBjK0ve5BdEeNAVxOsl/nvNMpJOaJA==
 
+"@h6s/calendar@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@h6s/calendar/-/calendar-2.0.1.tgz#ce3f0c9311ca2a961b18c74be801891984ae219c"
+  integrity sha512-9q5ksdnUsLDeuSm5arXzkxHyS22u7yi5TtVr4DZgW514AjdL+76kx7d+ScX9sKusasRQVxrhM2LTVmd8A/u42Q==
+
 "@headlessui/react@^1.7.17":
   version "1.7.17"
   resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.7.17.tgz#a0ec23af21b527c030967245fd99776aa7352bc6"

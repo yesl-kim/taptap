@@ -35,29 +35,26 @@ export const style = {
 }
 
 const IconButton = forwardRef<HTMLButtonElement, Props>(
-  function IconButtonComponent(
-    { className, Icon, label, ...buttonProps },
-    ref
-  ) {
-    return (
-      <div className="relative">
-        <button
-          ref={ref}
-          aria-label={label}
-          className={`${style.iconButton} ${className}`}
-          {...buttonProps}
-        >
-          <Icon aria-hidden className={style.icon} />
-        </button>
-        <div
-          aria-hidden
-          className="absolute left-[50%] top-[100%] -translate-x-[50%] w-auto z-10 bg-black/70 py-1 px-2 rounded-md text-white text-xs whitespace-nowrap hidden peer-hover:block"
-        >
-          {label}
-        </div>
+  ({ className, Icon, label, type = 'button', ...buttonProps }, ref) => (
+    <div className="relative">
+      <button
+        ref={ref}
+        aria-label={label}
+        className={`${style.iconButton} ${className}`}
+        type={type}
+        {...buttonProps}
+      >
+        <Icon aria-hidden className={style.icon} />
+      </button>
+      <div
+        aria-hidden
+        className="absolute left-[50%] top-[100%] -translate-x-[50%] w-auto z-10 bg-black/70 py-1 px-2 rounded-md text-white text-xs whitespace-nowrap hidden peer-hover:block"
+      >
+        {label}
       </div>
-    )
-  }
+    </div>
+  )
 )
 
+IconButton.displayName = 'IconButton'
 export default memo(IconButton)
