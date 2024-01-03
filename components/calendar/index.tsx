@@ -11,16 +11,15 @@ import DateCell from './date-cell'
 
 interface Props {
   selectedDate: Date
+  onChange: (date: Date) => void
 }
 
-const Calendar = ({ selectedDate }: Props) => {
-  const c = useCalendar()
-  const { headers, body, cursorDate, navigation } = c
-  console.log(c)
+const Calendar = ({ selectedDate, onChange }: Props) => {
+  const { headers, body, cursorDate, navigation } = useCalendar()
 
   return (
     <div className="px-3 w-[256px]">
-      <header className="flex items-center px-3 mb-3">
+      <header className="flex items-center pl-2 mb-3">
         <span className="text-gray-700 mr-auto">
           {format(cursorDate, 'yyyy년 M월')}
         </span>
@@ -36,7 +35,7 @@ const Calendar = ({ selectedDate }: Props) => {
         />
       </header>
       <section>
-        <table className="border-spacing-1 border-separate">
+        <table className="w-full border-spacing-1 border-separate">
           <thead>
             <tr>
               {headers.weekDays.map(({ key, value }) => (
@@ -54,7 +53,7 @@ const Calendar = ({ selectedDate }: Props) => {
                     <DateCell
                       value={value}
                       active={isSameDay(value, selectedDate)}
-                      onClick={(e) => console.log(e)}
+                      onClick={onChange}
                       isCurrentMonth={isCurrentMonth}
                     />
                   </td>

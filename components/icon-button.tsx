@@ -26,10 +26,11 @@ interface Props
   'aria-label'?: string
 }
 
-// aria 속성을 라벨로 받고 싶다면
+// TODO: aria 속성을 라벨로 받고 싶다면 (강제하고 싶다면)
 // https://stackoverflow.com/questions/73887723/enforce-mutually-exclusive-aria-label-attributes-via-types-and-modify-the-props
 export const style = {
-  iconButton: 'w-[30px] p-1.5 group hover:bg-neutral-200 rounded-full peer',
+  iconButton:
+    'w-[28px] p-1.5 group hover:bg-neutral-200 rounded-full align-center peer',
   icon: 'group-hover:text-neutral-900 text-neutral-500 stroke-2',
 }
 

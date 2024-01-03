@@ -38,7 +38,7 @@ const TimeSelect = ({
     {({ open, value }) => (
       <div className="relative">
         <Listbox.Button
-          className={`px-3 py-2 rounded transition-all outline-none focus:outline-none text-sm text-gray-600 ${
+          className={`w-[90px] py-2 rounded transition-all outline-none focus:outline-none text-sm text-gray-600 text-center ${
             valid
               ? `bg-neutral-100 hover:bg-neutral-200 ${
                   open ? 'border-b-2 border-blue-600' : ''

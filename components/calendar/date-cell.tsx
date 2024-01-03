@@ -23,10 +23,10 @@ const DateCell = ({ value, active, onClick, isCurrentMonth }: Props) => {
       type="button"
       onClick={() => onClick(value)}
       className={`${defaultStyle} ${
-        isCurrentMonth ? 'text-gray-700' : 'text-gray-400'
+        isCurrentMonth ? 'text-gray-800' : 'text-gray-400'
       } ${
         active
-          ? 'bg-blue-100 hover:bg-blue-100/50'
+          ? 'bg-blue-100 hover:bg-blue-300/50'
           : 'bg-white hover:bg-gray-100'
       }`}
     >

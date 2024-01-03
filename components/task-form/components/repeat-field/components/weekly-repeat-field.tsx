@@ -7,7 +7,6 @@ import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 
 import DayOfWeekSelect from './day-of-week-select'
-import WeeklyPeriodFields from './weekly-period-fields'
 
 // TODO: repeat type 지정
 type RepeatType = null | 'Weekly'
@@ -15,6 +14,7 @@ type RepeatType = null | 'Weekly'
 export type RepeatFormData = {
   startDate: Date
   times: PeriodData[]
+  daysOfMonth?: number[]
   endDate?: Date
 }
 interface Props {
@@ -57,7 +57,6 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
         selectedDays={selectedDays}
         onClickDay={toggleSelectDay}
       />
-      {/* <WeeklyPeriodFields selectedDays={selectedDays} name={name} /> */}
       <div>
         {selectedDays.map((date, i) => (
           <div key={date.toString()}>
@@ -67,6 +66,14 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
               {...register(`${name}.${i}.startDate`, {
                 value: base,
                 valueAsDate: true,
+                shouldUnregister: true,
+              })}
+            />
+            <input
+              hidden
+              readOnly
+              {...register(`${name}.${i}.daysOfMonth`, {
+                value: [getDay(date)],
                 shouldUnregister: true,
               })}
             />

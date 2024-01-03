@@ -15,6 +15,7 @@ interface Props {
 
 // TODO: getStartOfDay(date) -> date = <선택된 날짜> | <오늘>
 // => 선택된 날짜 기준으로 받을 수 있도록
+// TODO: style
 const PeriodFields = ({ name }: Props) => {
   const { control, watch } = useFormContext()
   const values: PeriodData[] = watch(name, [])
@@ -41,9 +42,11 @@ const PeriodFields = ({ name }: Props) => {
 
   return (
     <div className="flex gap-2">
-      <div>
+      <div className={'w-[256px]'}>
         {fields.length === 0 ? (
-          <p className="text-sm text-gray-500">기간 설정 안함</p>
+          <p className="h-[40px] px-2 leading-[40px] text-sm text-gray-500">
+            기간 설정 안함
+          </p>
         ) : (
           fields.map((field, idx) => (
             <div key={field.id} className="flex gap-2 items-center">
@@ -57,7 +60,7 @@ const PeriodFields = ({ name }: Props) => {
           ))
         )}
       </div>
-      <div className="p-2">
+      <div className="h-[40px] flex items-center">
         <IconButton
           Icon={PlusCircleIcon}
           label="이 요일에 기간 추가"

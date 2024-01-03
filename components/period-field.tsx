@@ -1,7 +1,7 @@
 import { useFormContext, Controller } from 'react-hook-form'
-import TimeSelect from './TimeSelect'
-import { addHours, addMinutes, format, isBefore, isSameMinute } from 'date-fns'
-import { useEffect, useMemo, useState } from 'react'
+import TimeSelect from './time-select'
+import { addHours, addMinutes, isBefore, isSameMinute } from 'date-fns'
+import { useMemo, useState } from 'react'
 import { round30Minutes } from '@/lib/datetime'
 import { nestedValue } from '@/lib/parser'
 
