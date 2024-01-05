@@ -8,6 +8,12 @@ import ColorField from './color-field'
 import RepeatField from './repeat-field/repeat-field'
 import CategorySelect from './category-select'
 
+const DATA = [
+  { id: '1', title: 'category 1' },
+  { id: '2', title: 'category 2' },
+  { id: '3', title: 'category 3' },
+]
+
 export default function TaskForm() {
   const method = useForm({
     defaultValues: {
@@ -36,7 +42,7 @@ export default function TaskForm() {
         <input name="title" required placeholder="제목" />
 
         <div className="flex gap-2 items-center">
-          {/* <CategoryField /> */}
+          <CategorySelect name="categoryId" categories={DATA} />
           <ColorField />
         </div>
 

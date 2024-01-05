@@ -72,7 +72,6 @@ export default function ColorField() {
 
   const selectByKeyboard: KeyboardEventHandler<HTMLDivElement> = useCallback(
     (e) => {
-      console.log(e.key)
       e.preventDefault()
       if (e.key === KEY.enter) {
         const newValue =

@@ -95,6 +95,7 @@ const NonRepeatField = ({ name }: Props) => {
         })}
       </div>
       <button
+        type="button"
         className="p-2 rounded-sm text-blue-600 hover:bg-blue-50"
         onClick={() => append({ startDate: new Date(), times: [] })}
       >
