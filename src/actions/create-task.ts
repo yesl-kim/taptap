@@ -10,43 +10,53 @@ import { TaskCreateInput, taskCreateInputSchema } from '@/types/schema'
 //  - data type
 // 2. create new task
 // TODO: error handling
+// TODO: finally? return data? action?
 export const createTask = async (data: TaskCreateInput) => {
-  try {
-    // ??? variables name
-    const schemaWithAuth = withAuth(taskCreateInputSchema)
+  // ??? variables name
+  const schemaWithAuth = withAuth(taskCreateInputSchema)
 
-    const {
+  const {
+    title,
+    color,
+    repeats,
+    category,
+    session: {
+      user: { email },
+    },
+  } = await schemaWithAuth.parseAsync(data)
+
+  await prisma.task.create({
+    data: {
       title,
       color,
-      repeats,
-      categoryId,
-      session: {
-        user: { email },
+      repeat: {
+        createMany: {
+          data: repeats,
+        },
       },
-    } = await schemaWithAuth.parseAsync(data)
-
-    await prisma.task.create({
-      data: {
-        title,
-        color,
-        repeat: {
-          createMany: {
-            data: repeats,
+      category: {
+        connectOrCreate: {
+          where: {
+            owner_title: {
+              owner: email,
+              title: category.title,
+            },
           },
-        },
-        category: {
-          connect: {
-            id: categoryId,
-          },
-        },
-        user: {
-          connect: {
-            email,
+          create: {
+            title: category.title,
+            user: {
+              connect: {
+                email,
+              },
+            },
           },
         },
       },
-    })
-  } catch (error) {
-    console.log('error in create task: ', error)
-  }
+      user: {
+        connect: {
+          email,
+        },
+      },
+    },
+  })
 }

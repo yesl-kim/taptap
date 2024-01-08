@@ -110,7 +110,7 @@ model Repeat {
   
   startDate DateTime  @default(now())
   endDate DateTime?
-  times    Json?     // [시작시간, 종료시간][] format: hh:mm (24hours)
+  times    Json?     // { start: string, end: string }[] format: hh:mm (24hours)
   
   type  RepeatType? // None = 반복안함
   interval  Int? // 주기
