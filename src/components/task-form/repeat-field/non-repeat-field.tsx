@@ -63,7 +63,7 @@ const NonRepeatField = ({ name }: Props) => {
                       <Menu.Button className="px-3 py-2 rounded transition-all outline-none focus:outline-none text-sm text-gray-600 hover:bg-gray-100">
                         {format(startDate.value, 'yyyy년 M월 d일')}
                       </Menu.Button>
-                      <Menu.Items className="absolute mt-2 bg-white z-10 pb-2 shadow-md">
+                      <Menu.Items className="absolute mt-2 bg-white z-10 pb-2 shadow-md rounded">
                         <Menu.Item>
                           {({ close }) => (
                             <Calendar
@@ -100,7 +100,7 @@ const NonRepeatField = ({ name }: Props) => {
       </div>
       <button
         type="button"
-        className="p-2 rounded-sm text-blue-600 hover:bg-blue-50"
+        className="p-2 rounded text-blue-600 text-sm hover:bg-blue-50/70"
         onClick={() => append({ startDate: new Date(), times: [] })}
       >
         날짜 추가

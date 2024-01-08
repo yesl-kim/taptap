@@ -48,15 +48,15 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
   }
 
   return (
-    <div>
+    <>
       <DayOfWeekSelect
         base={base}
         selectedDays={selectedDays}
         onClickDay={toggleSelectDay}
       />
-      <div>
+      <div className="mt-2">
         {selectedDays.map((date, i) => (
-          <div key={date.toString()}>
+          <div key={date.toString()} className="flex gap-2 items-center">
             <input
               hidden
               readOnly
@@ -84,12 +84,14 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
                 shouldUnregister: true,
               })}
             />
-            <span>{format(date, 'E', { locale: ko })}</span>
+            <span className="text-gray-900 basis-10">
+              {format(date, 'E', { locale: ko })}
+            </span>
             <PeriodFields name={`${name}.${i}.times`} />
           </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }
 

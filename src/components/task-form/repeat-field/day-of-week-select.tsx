@@ -28,7 +28,7 @@ const DayOfWeekSelect = ({
           type="button"
           key={getDay(date)}
           onClick={() => onClickDay(date)}
-          className={`w-[30px] h-[30px] leading-[30px] align-center rounded-full text-sm ${
+          className={`w-[30px] h-[30px] leading-[30px] align-center rounded-full text-xs ${
             isActive(date)
               ? 'bg-blue-600 text-white'
               : 'bg-gray-100 text-gray-600'

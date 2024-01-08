@@ -12,7 +12,7 @@ import {
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 
-import StyledSelectButton from './styled-select-button'
+import BasicSelectButton from '@/components/basic-select-button'
 
 export type Category = {
   id: string
@@ -62,17 +62,15 @@ const CategorySelect = ({ categories, name }: Props) => {
 
   return (
     <div className="relative">
-      <button
+      <BasicSelectButton
         type="button"
         role="combobox"
         onClick={openCombobox}
         aria-expanded={on}
         aria-controls="category-combobox"
       >
-        <StyledSelectButton>
-          {value?.title ?? '카테고리 선택'}
-        </StyledSelectButton>
-      </button>
+        {value?.title ?? '카테고리 선택'}
+      </BasicSelectButton>
       <div
         ref={combobox}
         id="category-combobox"
@@ -85,7 +83,7 @@ const CategorySelect = ({ categories, name }: Props) => {
               ref={input}
               autoFocus
               placeholder="카테고리 이름 입력"
-              className="focus:outline-none placeholder:text-gray-400 flex-1"
+              className="flex-1 text-sm focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
               displayValue={(c: Category) => c.title}
               onChange={(e) => setQuery(e.target.value)}
             />
