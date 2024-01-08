@@ -2,46 +2,77 @@
 
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { format } from 'date-fns'
 
-import { createTask } from '@/actions/create-task'
-import { categoryCreateInputSchema } from '@/types/schema'
+import {
+  categoryCreateInputSchema,
+  taskCreateInputSchema,
+  categoryUpdateInputSchema,
+  repeatCreateInputSchema,
+  periodDateSchema,
+} from '@/types/schema'
 
 import ColorField from './color-field'
 import RepeatField from './repeat-field/repeat-field'
 import CategorySelect, { Category } from './category-select'
-import { RepeatFormData } from './repeat-field/weekly-repeat-field'
 
-const DATA = [
-  { id: '1', title: 'category 1' },
-  { id: '2', title: 'category 2' },
-  { id: '3', title: 'category 3' },
-]
+const taskFormSchema = taskCreateInputSchema.extend({
+  category: z.union([categoryCreateInputSchema, categoryUpdateInputSchema]),
+  repeats: z.array(
+    repeatCreateInputSchema.extend({
+      times: z.optional(
+        z.array(
+          periodDateSchema.transform(({ start, end }) => ({
+            start: format(start, 'hh:mm'),
+            end: format(end, 'hh:mm'),
+          }))
+        )
+      ),
+    })
+  ),
+})
 
-// FIXME: type: use zod resolver
-export type TaskFormData = {
-  title: string
-  color: string
-  category: z.infer<typeof categoryCreateInputSchema>
-  repeats: RepeatFormData[]
-}
+type TaskFormData = z.infer<typeof taskFormSchema>
 
-interface Props {
+interface TaskFormProps {
   categories: Category[]
-  onSubmit: (data: TaskFormData) => void
+  action: (data: TaskFormData) => void
 }
 
-// TODO: validation 로직 정리
-export default function TaskForm({ categories, onSubmit }: Props) {
-  const method = useForm<TaskFormData>({
+export default function TaskForm({ categories, action }: TaskFormProps) {
+  const context = useForm<TaskFormData>({
     defaultValues: {
+      category: {},
       repeats: [],
     },
+    resolver: zodResolver(taskFormSchema),
   })
-  const { handleSubmit, register } = method
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isLoading, isSubmitSuccessful, isSubmitting },
+  } = context
+
+  // TODO: error, loading, ... manage foram state
+  const submit = async (task: TaskFormData) => {
+    console.log('task in form', task)
+    const result = await action(task)
+    console.log('result: ', result)
+  }
+
+  console.log('errors: ', errors)
+  console.log(
+    'isLoading, isSubmitSuccessful, isSubmitting: ',
+    isLoading,
+    isSubmitSuccessful,
+    isSubmitting
+  )
 
   return (
-    <FormProvider {...method}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <FormProvider {...context}>
+      <form onSubmit={handleSubmit(submit)}>
         <input {...register('title', { required: true })} placeholder="제목" />
 
         <div className="flex gap-2 items-center">
@@ -50,7 +81,9 @@ export default function TaskForm({ categories, onSubmit }: Props) {
         </div>
 
         <RepeatField />
-        <button type="submit">완료</button>
+        <button type="submit" disabled={isSubmitting}>
+          완료
+        </button>
       </form>
     </FormProvider>
   )

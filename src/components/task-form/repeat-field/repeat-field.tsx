@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Listbox } from '@headlessui/react'
+import { useFormContext } from 'react-hook-form'
 
 import StyledSelectButton from '../styled-select-button'
 import NonRepeatField from './non-repeat-field'
@@ -17,11 +18,16 @@ const options = [
 ]
 
 export default function RepeatField() {
-  const [type, setType] = useState(options[0])
+  const { resetField } = useFormContext()
+  const [type, setType] = useState(options[1])
+  const selectType = (newType: (typeof options)[number]) => {
+    setType(newType)
+    resetField('repeats')
+  }
 
   return (
     <div>
-      <Listbox value={type} onChange={setType}>
+      <Listbox value={type} onChange={selectType}>
         <div className="relative">
           <Listbox.Button>
             <StyledSelectButton>

@@ -1,37 +1,20 @@
 'use client'
 
-import {
-  DetailedHTMLProps,
-  InputHTMLAttributes,
-  KeyboardEventHandler,
-  forwardRef,
-  useState,
-  useRef,
-  MouseEventHandler,
-} from 'react'
-import { Combobox, Listbox } from '@headlessui/react'
-import {
-  Controller,
-  useController,
-  useForm,
-  useFormContext,
-} from 'react-hook-form'
-import { z } from 'zod'
+import { useState, useRef, MouseEventHandler } from 'react'
+import { Combobox } from '@headlessui/react'
+import { useController, useFormContext } from 'react-hook-form'
 import {
   ChevronDownIcon,
-  ChevronUpIcon,
   CheckIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline'
 
-import { isEmpty } from '@/utils/validator'
-import { categoryCreateInputSchema } from '@/types/schema'
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 
 import StyledSelectButton from './styled-select-button'
 
-type Category = {
+export type Category = {
   id: string
   title: string
 }
@@ -45,7 +28,11 @@ const CategorySelect = ({ categories, name }: Props) => {
   const { control } = useFormContext()
   const {
     field: { value, onChange },
-  } = useController({ control, name, defaultValue: {} })
+  } = useController({
+    control,
+    name,
+    defaultValue: {},
+  })
 
   const { on, turnOff: close, turnOn: open } = useBoolean()
   const combobox = useRef<HTMLDivElement>(null)
@@ -63,9 +50,7 @@ const CategorySelect = ({ categories, name }: Props) => {
   const openCombobox: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault()
     open()
-    console.log(e)
     if (input.current?.focus) {
-      console.log('focus')
       setTimeout(() => input.current?.focus())
     }
   }
@@ -122,16 +107,12 @@ const CategorySelect = ({ categories, name }: Props) => {
                   }`
                 }
               >
-                {({ selected }) => (
-                  <>
-                    <span className="block">{category.title}</span>
-                    {selected ? (
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-900">
-                        <CheckIcon className="h-4 w-4 stroke-2" aria-hidden />
-                      </span>
-                    ) : null}
-                  </>
-                )}
+                <span className="block">{category.title}</span>
+                {value.title === category.title ? (
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-900">
+                    <CheckIcon className="h-4 w-4 stroke-2" aria-hidden />
+                  </span>
+                ) : null}
               </Combobox.Option>
             ))}
 

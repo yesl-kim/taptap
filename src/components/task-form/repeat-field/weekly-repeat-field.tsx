@@ -2,14 +2,12 @@ import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { format, isSameDay, getDay, isAfter } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { RepeatType } from '@prisma/client'
 
 import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
 
-// TODO: repeat type 지정
-type RepeatType = null | 'Weekly'
-// repeatField => RepeatFormData[]
 export type RepeatFormData = {
   startDate: Date
   times: PeriodData[]
@@ -71,7 +69,17 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
             <input
               hidden
               readOnly
-              {...register(`${name}.${i}.daysOfMonth`, {
+              {...register(`${name}.${i}.type`, { value: RepeatType.Weekly })}
+            />
+            <input
+              hidden
+              readOnly
+              {...register(`${name}.${i}.interval`, { value: 1 })}
+            />
+            <input
+              hidden
+              readOnly
+              {...register(`${name}.${i}.daysOfWeek`, {
                 value: [getDay(date)],
                 shouldUnregister: true,
               })}

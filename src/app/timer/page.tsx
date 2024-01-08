@@ -1,12 +1,10 @@
-import { auth } from '@/lib/auth'
-
-import TaskForm from '@/components/task-form/task-form'
+import NewTask from '@/containers/new-task'
 
 export default async function TimerPage() {
   return (
     <main className="bg-white">
       timer page
-      <TaskForm />
+      <NewTask />
     </main>
   )
 }

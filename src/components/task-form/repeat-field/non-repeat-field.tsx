@@ -23,7 +23,11 @@ const NonRepeatField = ({ name }: Props) => {
     formState: { errors },
     trigger,
   } = useFormContext()
-  const { fields, append, remove } = useFieldArray({ control, name })
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name,
+    shouldUnregister: true,
+  })
 
   const value: RepeatFormData[] = watch(name, [])
   useEffect(() => {

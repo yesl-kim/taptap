@@ -1,13 +1,8 @@
 'use client'
 
-import {
-  KeyboardEventHandler,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { KeyboardEventHandler, useCallback, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { useController, useFormContext } from 'react-hook-form'
 
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
@@ -47,9 +42,16 @@ const KEY = {
 const defaultValue = options[0]
 
 // FIXME: 기존에 설정한 값이 있으면 그 값이 기본값
+// TODO: apply headless ui - listbox
 
-export default function ColorField() {
-  const { on, toggle, turnOff: closeMenu } = useBoolean()
+// TODO: props - name, onChange, ref, value ... (rhf register return value) -> rules 적용되는지 확인
+// validation 로직이 task form에 한 번에 있는게 좋지 않을까
+interface Props {
+  name: string
+}
+
+export default function ColorField({ name }: Props) {
+  const { on, toggle, turnOff: closeMenu, turnOn: openMenu } = useBoolean()
 
   const listRef = useRef<HTMLUListElement>(null)
   const [focusedIndex, setFocusedIndex] = useState(0)
@@ -61,24 +63,33 @@ export default function ColorField() {
   }, [closeMenu])
   useOutsideClick({ outsideRef, action: close })
 
-  const [value, setValue] = useState<string>(defaultValue)
-  const onChange = useCallback(
+  const { control } = useFormContext()
+  const {
+    field: { value, onChange },
+  } = useController({ control, name, defaultValue: options[0] })
+
+  const select = useCallback(
     (newValue: string) => {
-      setValue(newValue)
+      onChange(newValue)
       close()
     },
-    [close]
+    [close, onChange]
   )
 
   const selectByKeyboard: KeyboardEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       e.preventDefault()
       if (e.key === KEY.enter) {
+        if (!on) {
+          openMenu()
+          return
+        }
+
         const newValue =
           listRef.current?.children[focusedIndex].getAttribute(
             ITEM_DATA_ATTR
           ) ?? ''
-        onChange(newValue)
+        select(newValue)
         return
       }
 
@@ -93,7 +104,7 @@ export default function ColorField() {
         return
       }
     },
-    [focusedIndex, onChange]
+    [focusedIndex, select, openMenu, on]
   )
 
   return (
@@ -105,7 +116,7 @@ export default function ColorField() {
         aria-expanded={on}
         aria-controls="color-select-field"
         onClick={toggle}
-        className="flex gap-3 items-center p-2 outline-none focus:outline-none"
+        className="flex gap-3 items-center p-2 focus-visible:outline-2"
       >
         <div
           className="w-[20px] h-[20px] rounded-full"
@@ -120,14 +131,14 @@ export default function ColorField() {
           autoFocus
           role="listbox"
           id="color-select-field"
-          className="absolute shadow-md flex w-[62px] flex-wrap py-3 gap-2 justify-center rounded-md bg-white"
+          className="absolute shadow-md flex w-[62px] flex-wrap py-3 gap-2 justify-center rounded-md bg-white z-20"
         >
           {options.map((color, idx) => (
             <li
               key={color}
-              className="w-[16px] h-[16px] rounded-full data-[focused=true]:ring-2"
+              className="w-[16px] h-[16px] rounded-full data-[focused=true]:ring-2 cursor-pointer hover:shadow-inner"
               style={{ backgroundColor: color }}
-              onClick={() => onChange(color)}
+              onClick={() => select(color)}
               {...{
                 [ITEM_DATA_ATTR]: color,
                 [FOCUSED_ATTR]: idx === focusedIndex,
