@@ -2,12 +2,22 @@
 
 import { withAuth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { fromZodError } from 'zod-validation-error'
+import { ValidationError, fromZodError } from 'zod-validation-error'
 import { z } from 'zod'
 
-import { TaskCreateInput, taskCreateInputSchema } from '@/types/schema'
+import {
+  TaskCreateInput,
+  taskCreateInputSchema,
+  taskSchema,
+} from '@/types/schema'
+import { responseSchema } from '@/types/api'
 
-export const createTask = async (data: TaskCreateInput) => {
+const response = responseSchema(z.NEVER)
+type CreateTaskResponse = z.infer<typeof response>
+
+export const createTask = async (
+  data: TaskCreateInput
+): Promise<CreateTaskResponse> => {
   try {
     const schemaWithAuth = withAuth(taskCreateInputSchema)
 
@@ -56,16 +66,17 @@ export const createTask = async (data: TaskCreateInput) => {
       },
     })
 
-    return { success: true, data: task }
+    return { success: true }
     // TODO: revalidate
   } catch (error) {
+    console.log('error: ', error)
     if (error instanceof z.ZodError) {
-      return { success: false, message: fromZodError(error) }
+      return { success: false, error: '입력값을 확인해주세요.' }
     }
 
     return {
       success: false,
-      message: '알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+      error: '알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
     }
   }
 }

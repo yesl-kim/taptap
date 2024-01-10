@@ -40,10 +40,10 @@ const TimeSelect = ({
         <Listbox.Button
           className={`w-[90px] py-2 rounded transition-all outline-none focus:outline-none text-sm text-gray-600 text-center ${
             valid
-              ? `bg-neutral-100 hover:bg-neutral-200 ${
+              ? `bg-neutral-100 hover:bg-neutral-200 focus:border-b-2 focus:border-blue-600 ${
                   open ? 'border-b-2 border-blue-600' : ''
                 }`
-              : `border-red-600 bg-red-100 hover:bg-red-200 ${
+              : `border-red-600 bg-red-100 hover:bg-red-200 focus:border-b-2 ${
                   open ? 'border-b-2' : 'border-b-[1px]'
                 }`
           }`}

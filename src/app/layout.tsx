@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google'
+import { Toaster } from 'react-hot-toast'
 
 import type { Metadata } from 'next'
 import './globals.css'
@@ -7,7 +8,6 @@ import { TodayContextProvider } from '@/hooks/useToday'
 
 import Sidebar from '@/components/sidebar/sidebar'
 import Profile from '@/components/profile/profile'
-
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,6 +37,7 @@ export default function RootLayout({
             </div>
           </TodayContextProvider>
         </AuthContext>
+        <Toaster />
       </body>
     </html>
   )

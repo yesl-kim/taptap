@@ -6,6 +6,7 @@ import { PlusCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { round30Minutes } from '@/utils/datetime'
 import useToday from '@/hooks/useToday'
+import { isEmpty } from '@/utils/validator'
 
 import PeriodField, { PeriodData } from '@/components/period-field'
 import IconButton from './icon-button'
@@ -44,7 +45,7 @@ const PeriodFields = ({ name }: Props) => {
   return (
     <div className="flex gap-2">
       <div className={'w-[256px]'}>
-        {fields.length === 0 ? (
+        {isEmpty(fields) ? (
           <p className="h-[40px] px-2 leading-[40px] text-sm text-gray-500">
             기간 설정 안함
           </p>

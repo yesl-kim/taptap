@@ -60,7 +60,7 @@ const NonRepeatField = ({ name }: Props) => {
                   }}
                   render={({ field: startDate }) => (
                     <Menu as="div" className="relative">
-                      <Menu.Button className="px-3 py-2 rounded transition-all outline-none focus:outline-none text-sm text-gray-600 hover:bg-gray-100">
+                      <Menu.Button className="px-3 py-2 rounded transition-all outline-none focus:outline-none focus:bg-neutral-200 text-sm text-gray-600 hover:bg-neutral-100">
                         {format(startDate.value, 'yyyy년 M월 d일')}
                       </Menu.Button>
                       <Menu.Items className="absolute mt-2 bg-white z-10 pb-2 shadow-md rounded">
