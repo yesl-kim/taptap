@@ -2,7 +2,6 @@
 
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { Category } from '@prisma/client'
 
 import { sessionSchema } from '@/types/schema'
 
@@ -10,7 +9,7 @@ import { sessionSchema } from '@/types/schema'
 // 1. throw
 // 2. 화면에서 받아서 처리 (?)
 // 에러 구분 -> 에러 바운더리로 처리
-export const getCategories = async (): Promise<Category[]> => {
+export const getCategories = async () => {
   //   try {
   const {
     user: { email },
