@@ -1,47 +1,30 @@
 'use client'
 
-import {
-  ButtonHTMLAttributes,
-  DetailedHTMLProps,
-  forwardRef,
-  memo,
-} from 'react'
+import { ButtonHTMLAttributes, forwardRef, memo } from 'react'
 
-interface Props
-  extends Omit<
-    DetailedHTMLProps<
-      ButtonHTMLAttributes<HTMLButtonElement>,
-      HTMLButtonElement
-    >,
-    'children'
-  > {
-  Icon: React.ForwardRefExoticComponent<
-    Omit<React.SVGProps<SVGSVGElement>, 'ref'> & {
-      title?: string | undefined
-      titleId?: string | undefined
-    } & React.RefAttributes<SVGSVGElement>
-  >
+export type IconButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'aria-label' | 'aria-labelledby'
+> & {
+  Icon: HeroIcon
   label: string
-  'aria-label'?: string
 }
 
-// TODO: aria 속성을 라벨로 받고 싶다면 (강제하고 싶다면)
-// https://stackoverflow.com/questions/73887723/enforce-mutually-exclusive-aria-label-attributes-via-types-and-modify-the-props
 export const style = {
   iconButton:
     'w-[28px] p-1.5 group hover:bg-neutral-200 rounded-full align-center peer',
   icon: 'group-hover:text-neutral-900 text-neutral-500 stroke-2',
 }
 
-const IconButton = forwardRef<HTMLButtonElement, Props>(
+const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ className, Icon, label, type = 'button', ...buttonProps }, ref) => (
     <div className="relative">
       <button
         ref={ref}
+        {...buttonProps}
         aria-label={label}
         className={`${style.iconButton} ${className}`}
         type={type}
-        {...buttonProps}
       >
         <Icon aria-hidden className={style.icon} />
       </button>

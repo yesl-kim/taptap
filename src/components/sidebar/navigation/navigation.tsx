@@ -14,11 +14,11 @@ const items: NavItemProps[] = [
     Icon: ClockIcon,
     href: '/timer',
   },
-  // {
-  //   title: 'Time Table',
-  //   Icon: CalendarIcon,
-  //   href: 'timeTable',
-  // },
+  {
+    title: 'Time Table',
+    Icon: CalendarIcon,
+    href: '/calendar/week',
+  },
   {
     title: 'Category',
     Icon: ChartBarIcon,
