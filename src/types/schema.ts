@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { z } from 'zod'
 
 export const model = z.object({
@@ -58,6 +57,8 @@ export const repeatCreateInputSchema = repeatSchema
     daysOfWeek: true,
   })
 
+export type Repeat = z.infer<typeof repeatSchema>
+
 // category =========================================
 export const categorySchema = model.extend({
   title: z.string({ required_error: '필수값입니다.' }).min(1),
@@ -93,5 +94,7 @@ export const taskCreateInputSchema = taskSchema
     repeats: z.array(repeatCreateInputSchema),
     category: categoryCreateInputSchema,
   })
+
+export type Task = z.infer<typeof taskSchema>
 
 export type TaskCreateInput = z.infer<typeof taskCreateInputSchema>

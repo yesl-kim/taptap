@@ -35,7 +35,7 @@ export const createTask = async (
       data: {
         title,
         color,
-        repeat: {
+        repeats: {
           createMany: {
             data: repeats,
           },
