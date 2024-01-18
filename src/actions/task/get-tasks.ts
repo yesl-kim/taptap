@@ -1,17 +1,22 @@
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { Prisma, Repeat } from '@prisma/client'
+import { Repeat, Task } from '@prisma/client'
+import { startOfDay } from 'date-fns'
 
 import { sessionSchema } from '@/types/schema'
 
-import { isPlannedOn } from './task.utils'
+import { isPlannedOn } from './task-action.utils'
 
 type SuccessResponse<T> = { success: true; data: T }
 type ErrorResponse = { success: false; error: string }
 type ResponseType<T> = SuccessResponse<T> | ErrorResponse
-type Task = Prisma.TaskGetPayload<{ include: { repeats: true } }>
+export type TaskWithRepeat = Task & { repeat: Repeat }
 
-export const getTasks = async (date: Date): Promise<ResponseType<Task[]>> => {
+export const getTasksByDate = async (
+  _date: Date
+): Promise<ResponseType<TaskWithRepeat[]>> => {
+  const date = startOfDay(_date)
+
   try {
     const {
       user: { email },
@@ -26,8 +31,14 @@ export const getTasks = async (date: Date): Promise<ResponseType<Task[]>> => {
           },
         },
         include: { repeats: true },
+        orderBy: { createdAt: 'asc' },
       })
-    ).filter(({ repeats }) => repeats.some(isPlanned))
+    )
+      .map(({ repeats, ...task }) => ({
+        ...task,
+        repeat: repeats.find(isPlanned),
+      }))
+      .filter((task): task is TaskWithRepeat => !!task.repeat)
 
     return { success: true, data: tasks }
   } catch (e) {
