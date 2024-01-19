@@ -48,10 +48,8 @@ export const isPlannedOn = (date: Date, repeat: Repeat): boolean => {
     return isSameDay(startDate, date)
   }
 
-  const _date = startOfDay(date),
-    _startDate = startOfDay(startDate)
   if (
-    isBefore(_date, _startDate) ||
+    isBefore(date, startDate) ||
     (endDate && isAfter(date, endOfDay(endDate)))
   ) {
     return false

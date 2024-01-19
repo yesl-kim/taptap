@@ -4,7 +4,7 @@ type ListItemProps = PropsWithChildren & {
 
 const ListItem = ({ children, before }: ListItemProps) => {
   return (
-    <li className="min-h-[32px] flex items-center gap-2 mb-3 last-of-type:mb-0">
+    <li className="min-h-[32px] flex items-center gap-4 mb-3 last-of-type:mb-0">
       {before ? (
         <div className="self-stretch w-[40px] flex items-center justify-center max-h-[36px]">
           <div

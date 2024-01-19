@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { Repeat, Task } from '@prisma/client'
+import { Prisma, Repeat, Task } from '@prisma/client'
 import { startOfDay } from 'date-fns'
 
 import { sessionSchema } from '@/types/schema'
@@ -10,7 +10,9 @@ import { isPlannedOn } from './task-action.utils'
 type SuccessResponse<T> = { success: true; data: T }
 type ErrorResponse = { success: false; error: string }
 type ResponseType<T> = SuccessResponse<T> | ErrorResponse
-export type TaskWithRepeat = Task & { repeat: Repeat }
+export type TaskWithRepeat = Prisma.TaskGetPayload<{
+  include: { category: { select: { id: true; title: true } } }
+}> & { repeat: Repeat }
 
 export const getTasksByDate = async (
   _date: Date
@@ -30,7 +32,10 @@ export const getTasksByDate = async (
             email,
           },
         },
-        include: { repeats: true },
+        include: {
+          repeats: true,
+          category: { select: { id: true, title: true } },
+        },
         orderBy: { createdAt: 'asc' },
       })
     )

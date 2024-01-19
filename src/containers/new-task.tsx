@@ -1,4 +1,4 @@
-import { createTask } from '@/actions/create-task'
+import { createTask } from '@/actions/task/create-task'
 import { getCategories } from '@/actions/get-categories'
 
 import TaskForm from '@/components/task-form/task-form'

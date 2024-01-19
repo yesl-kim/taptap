@@ -1,10 +1,12 @@
 'use client'
 
-import { Interval, addMinutes } from 'date-fns'
+import { Interval, addMinutes, format } from 'date-fns'
 import React, { MouseEventHandler, ReactNode, useState } from 'react'
+import { ko } from 'date-fns/locale'
 
 import useToday from '@/hooks/useToday'
 import { round30Minutes } from '@/utils/datetime'
+import { Period } from '@/types/schema'
 
 import { HEIGHT_PER_STEP, TOTAL_HEIGHT } from './timetable.constants'
 import {
@@ -21,9 +23,7 @@ type TimeTableProps<T> = {
   newBlock: (selectedTime: Date) => ReactNode
 }
 
-const minHeight = `min-h-[${HEIGHT_PER_STEP}px]`
-
-const Timetable = <T extends Interval>({
+const Timetable = <T extends { time: Period }>({
   data,
   date,
   newBlock,
@@ -63,11 +63,11 @@ const Timetable = <T extends Interval>({
       <div className="absolute inset-0 pointer-events-none">
         {data.map((item) => (
           <div
-            key={`${item.start.toString()} ~ ${item.end.toString()}`}
-            className={`absolute inset-x-0 flex ${minHeight} pointer-events-auto`}
+            key={`${item.time.start.toString()} ~ ${item.time.end.toString()}`}
+            className={`absolute inset-x-0 flex pointer-events-auto`}
             style={{
-              top: timeToOffset(item.start),
-              height: intervalToHeight(item),
+              top: timeToOffset(item.time.start),
+              height: intervalToHeight(item.time),
               minHeight: HEIGHT_PER_STEP,
             }}
           >

@@ -15,7 +15,9 @@ import {
   startOfDay,
   endOfDay,
   add,
+  format,
 } from 'date-fns'
+import { ko } from 'date-fns/locale'
 
 interface TodayContextType {
   today: Date
@@ -36,10 +38,7 @@ export const TodayContextProvider = ({
   const [offset, setOffset] = useState(DEFAULT_OFFSET)
   const getStartOfDay = useCallback(
     // 하루의 시작 시간으로 맞춤
-    (date: Date) =>
-      add(startOfDay(sub(date, { hours: DEFAULT_OFFSET })), {
-        hours: offset,
-      }),
+    (date: Date) => add(startOfDay(date), { hours: offset }),
     [offset]
   )
 
@@ -59,6 +58,10 @@ export const TodayContextProvider = ({
     const id = setTimeout(() => setToday(tomorrow), delay)
     return () => clearTimeout(id)
   }, [today, getStartOfDay])
+
+  useEffect(() => {
+    console.log('today', format(today, 'MM.dd HH:mm', { locale: ko }))
+  }, [today])
 
   const value = useMemo(
     () => ({ today, getStartOfDay, offset, setOffset, getEndOfDay }),

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "prisma generate && next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint --fix"
@@ -20,7 +20,7 @@
     "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^5.6.0",
     "clsx": "^2.1.0",
-    "date-fns": "^2.30.0",
+    "date-fns": "^3.2.0",
     "next": "14.0.3",
     "next-auth": "^5.0.0-beta.4",
     "react": "18.2.0",

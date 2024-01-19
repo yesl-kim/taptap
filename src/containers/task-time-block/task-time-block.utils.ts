@@ -1,7 +1,9 @@
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
-export const intervalToString = (start: Date, end: Date) => {
+import { Period } from '@/types/schema'
+
+export const intervalToString = ({ start, end }: Period) => {
   const [startHalfDay, endHalfDay] = [start, end].map((time) =>
     format(time, 'aaa', { locale: ko })
   )

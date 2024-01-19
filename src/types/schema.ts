@@ -28,10 +28,14 @@ export const periodStringSchema = z.object({
   end: timeSchema,
 })
 
+export type PeriodString = z.infer<typeof periodStringSchema>
+
 export const periodDateSchema = z.object({
   start: z.date(),
   end: z.date(),
 })
+
+export type Period = z.infer<typeof periodDateSchema>
 
 export const repeatSchema = model.extend({
   startDate: z.date(),
