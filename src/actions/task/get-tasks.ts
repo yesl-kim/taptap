@@ -1,7 +1,10 @@
+import 'server-only'
+
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { Prisma, Repeat, Task } from '@prisma/client'
-import { startOfDay } from 'date-fns'
+import { fromUnixTime, startOfDay } from 'date-fns'
+import { cache } from 'react'
 
 import { sessionSchema } from '@/types/schema'
 
@@ -14,42 +17,46 @@ export type TaskWithRepeat = Prisma.TaskGetPayload<{
   include: { category: { select: { id: true; title: true } } }
 }> & { repeat: Repeat }
 
-export const getTasksByDate = async (
-  _date: Date
-): Promise<ResponseType<TaskWithRepeat[]>> => {
-  const date = startOfDay(_date)
+export const preloadTasksByDate = (unixTime: number) => {
+  void getTasksByDate(unixTime)
+}
 
-  try {
-    const {
-      user: { email },
-    } = sessionSchema.parse(await auth())
+export const getTasksByDate = cache(
+  async (unixTime: number): Promise<ResponseType<TaskWithRepeat[]>> => {
+    const date = startOfDay(fromUnixTime(unixTime))
 
-    const isPlanned = (repeat: Repeat) => isPlannedOn(date, repeat)
-    const tasks = (
-      await prisma.task.findMany({
-        where: {
-          user: {
-            email,
+    try {
+      const {
+        user: { email },
+      } = sessionSchema.parse(await auth())
+
+      const isPlanned = (repeat: Repeat) => isPlannedOn(date, repeat)
+      const tasks = (
+        await prisma.task.findMany({
+          where: {
+            user: {
+              email,
+            },
           },
-        },
-        include: {
-          repeats: true,
-          category: { select: { id: true, title: true } },
-        },
-        orderBy: { createdAt: 'asc' },
-      })
-    )
-      .map(({ repeats, ...task }) => ({
-        ...task,
-        repeat: repeats.find(isPlanned),
-      }))
-      .filter((task): task is TaskWithRepeat => !!task.repeat)
+          include: {
+            repeats: true,
+            category: { select: { id: true, title: true } },
+          },
+          orderBy: { createdAt: 'asc' },
+        })
+      )
+        .map(({ repeats, ...task }) => ({
+          ...task,
+          repeat: repeats.find(isPlanned),
+        }))
+        .filter((task): task is TaskWithRepeat => !!task.repeat)
 
-    return { success: true, data: tasks }
-  } catch (e) {
-    return {
-      success: false,
-      error: 'error',
+      return { success: true, data: tasks }
+    } catch (e) {
+      return {
+        success: false,
+        error: 'error',
+      }
     }
   }
-}
+)

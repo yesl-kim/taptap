@@ -1,3 +1,5 @@
+import { getUnixTime } from 'date-fns'
+
 import { TaskWithRepeat, getTasksByDate } from '@/actions/task/get-tasks'
 import { isEmpty } from '@/utils/validator'
 
@@ -12,7 +14,7 @@ type Props = {
 }
 
 const DailyTaskRecordTimetable = async ({ date }: Props) => {
-  const data = await getTasksByDate(date)
+  const data = await getTasksByDate(getUnixTime(date))
   if (!data.success) {
     throw data.error
   }
@@ -26,8 +28,8 @@ const DailyTaskRecordTimetable = async ({ date }: Props) => {
   )
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="h-[80px]">
+    <div className="flex flex-col h-full overflow-hidden">
+      <header>
         <DateHeader date={date} />
         <div>
           {기간이없는할일.map((task) => (
