@@ -45,8 +45,12 @@ const TaskTimeBlock = ({ task, date }: TaskTimeBlockProps) => {
         className="flex w-full rounded pt-0.5 pr-2 overflow-hidden text-white whitespace-nowrap break-words text-ellipsis opacity-50"
         style={{ backgroundColor: color }}
       >
-        <span>{title}</span>,&nbsp;
-        {time && <span>{intervalToString(time)}</span>}
+        <span>{title}</span>
+        {time && (
+          <>
+            ,&nbsp;<span>{intervalToString(time)}</span>
+          </>
+        )}
       </Popover.Button>
 
       <Popover.Panel className="absolute z-10 w-screen max-w-[500px]">

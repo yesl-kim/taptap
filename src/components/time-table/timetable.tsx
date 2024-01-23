@@ -1,27 +1,27 @@
 'use client'
 
-import { Interval, addMinutes, format } from 'date-fns'
+import { addHours, addMinutes } from 'date-fns'
 import React, { MouseEventHandler, ReactNode, useState } from 'react'
-import { ko } from 'date-fns/locale'
+import { useRouter } from 'next/navigation'
 
 import useToday from '@/hooks/useToday'
 import { round30Minutes } from '@/utils/datetime'
 import { Period } from '@/types/schema'
 
 import { HEIGHT_PER_STEP, TOTAL_HEIGHT } from './timetable.constants'
-import {
-  heightFloorToStep,
-  heightToDuration,
-  intervalToHeight,
-} from './timetable.utils'
+import { heightToDuration, intervalToHeight } from './timetable.utils'
 import TimetableGrid from './timetable-grid'
 
 type TimeTableProps<T> = {
   date: Date
   data: T[]
   renderItem: (item: T) => ReactNode
-  newBlock: (selectedTime: Date) => ReactNode
+  newBlock?: (selectedTime: Date) => ReactNode
 }
+
+/*
+ NOTE: params type = taskFormData
+ */
 
 const Timetable = <T extends { time: Period }>({
   data,
@@ -32,9 +32,29 @@ const Timetable = <T extends { time: Period }>({
   const { getStartOfDay } = useToday()
   const [offsetY, setOffsetY] = useState<null | number>(null)
 
-  const onClick: MouseEventHandler<HTMLDivElement> = (e) => {
-    setOffsetY(e.nativeEvent.offsetY)
+  const router = useRouter()
+
+  const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
+    const { offsetY } = e.nativeEvent
+    const selectedTime = getSelectedTime(offsetY)
+    const state = {
+      repeats: [
+        {
+          startDate: date,
+          start: selectedTime,
+          end: addHours(selectedTime, 1),
+        },
+      ],
+    }
+    const params = new URLSearchParams({
+      state: encodeURIComponent(JSON.stringify(state)),
+    })
+    router.push(`/taskedit?${params.toString()}`)
   }
+
+  // const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
+  //   setOffsetY(e.nativeEvent.offsetY)
+  // }
 
   const getSelectedTime = (offsetY: number) => {
     const duration = heightToDuration(offsetY)
@@ -47,18 +67,8 @@ const Timetable = <T extends { time: Period }>({
 
   return (
     <div className="relative bg-white" style={{ height: `${TOTAL_HEIGHT}px` }}>
-      <div className="absolute inset-0" onClick={onClick}>
-        {offsetY && (
-          <div
-            className="absolute inset-x-0"
-            style={{
-              top: heightFloorToStep(offsetY),
-            }}
-          >
-            {newBlock(getSelectedTime(offsetY))}
-          </div>
-        )}
-      </div>
+      <div className="absolute inset-0" onClick={selectTime} />
+      {/* <div className="absolute inset-0" onClick={selectTime} /> */}
 
       <div className="absolute inset-0 pointer-events-none">
         {data.map((item) => (
@@ -74,6 +84,15 @@ const Timetable = <T extends { time: Period }>({
             {renderItem(item)}
           </div>
         ))}
+        {/* <div
+          data-visible={!!offsetY}
+          className="absolute inset-x-0 top-0 hidden data-[visible=true]:block pointer-events-none"
+          style={{
+            transform: `translateY(${heightFloorToStep(offsetY ?? 0)}px)`,
+          }}
+        >
+          {newBlock(getSelectedTime(offsetY ?? 0))}
+        </div> */}
       </div>
     </div>
   )

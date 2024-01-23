@@ -3,9 +3,10 @@
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { format } from 'date-fns'
+import { addHours, format } from 'date-fns'
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
+import { Prisma } from '@prisma/client'
 
 import {
   categoryCreateInputSchema,
@@ -16,15 +17,24 @@ import {
   taskSchema,
 } from '@/types/schema'
 import { responseSchema } from '@/types/api'
+import useToday from '@/hooks/useToday'
 
 import ColorSelect from './color-select'
 import RepeatField from './repeat-field/repeat-field'
 import CategorySelect, { Category } from './category-select'
 
+const repeatWithDateTimesSchema = repeatCreateInputSchema.extend({
+  times: z.nullable(z.array(periodDateSchema)),
+})
+
 const taskFormSchema = taskCreateInputSchema.extend({
-  category: z.union([categoryCreateInputSchema, categoryUpdateInputSchema]),
+  category: categoryCreateInputSchema,
+  repeats: z.array(repeatWithDateTimesSchema),
+})
+
+const taskFormResolver = taskFormSchema.extend({
   repeats: z.array(
-    repeatCreateInputSchema.extend({
+    repeatWithDateTimesSchema.extend({
       times: z.optional(
         z.array(
           periodDateSchema.transform(({ start, end }) => ({
@@ -37,23 +47,23 @@ const taskFormSchema = taskCreateInputSchema.extend({
   ),
 })
 
-type TaskFormData = z.infer<typeof taskFormSchema>
+export type TaskFormData = z.infer<typeof taskFormSchema>
+type parsedTaskFormData = z.infer<typeof taskFormResolver>
 const taskResponseSchema = responseSchema(z.NEVER)
 type TaskResponse = z.infer<typeof taskResponseSchema>
 
-interface TaskFormProps {
+type TaskFormProps = {
   categories: Category[]
-  action: (data: TaskFormData) => Promise<TaskResponse> // response 타입 통일?
+  action: (data: parsedTaskFormData) => Promise<TaskResponse> // response 타입 통일?
+  task?: TaskFormData
 }
 
-export default function TaskForm({ categories, action }: TaskFormProps) {
+export default function TaskForm({ categories, action, task }: TaskFormProps) {
   const context = useForm<TaskFormData>({
-    defaultValues: {
-      category: {},
-      repeats: [],
-    },
-    resolver: zodResolver(taskFormSchema),
+    defaultValues: task,
+    resolver: zodResolver(taskFormResolver),
   })
+  console.log('task: ', task)
 
   const {
     handleSubmit,
@@ -62,7 +72,8 @@ export default function TaskForm({ categories, action }: TaskFormProps) {
   } = context
 
   // TODO: error, loading, ... manage foram state
-  const submit = async (task: TaskFormData) => {
+  const submit = async (task: parsedTaskFormData) => {
+    console.log(task, errors)
     const promise = action(task).then((res) => {
       if (!res.success) {
         throw res.error

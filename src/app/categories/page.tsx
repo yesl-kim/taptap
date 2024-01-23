@@ -1,4 +1,4 @@
-import { getCategories } from '@/actions/get-categories'
+import { getCategories } from '@/actions/category/get-categories'
 
 import Category from './components/category'
 import NewCategory from './components/new-category'

@@ -5,8 +5,8 @@ import { useFormState, useFormStatus } from 'react-dom'
 import { PlusIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline'
 
 import useBoolean from '@/hooks/useBoolean'
+import { createCategory } from '@/actions/category/create-category'
 
-import { createCategory } from '../actions'
 import IconButton, { style } from '@/components/icon-button'
 
 function NewCategory() {
