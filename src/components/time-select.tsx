@@ -78,7 +78,7 @@ const TimeSelect = ({
 
 export default memo(TimeSelect)
 
-const timeFormat = (time: Date) => format(time, 'a H:mm', { locale: ko })
+const timeFormat = (time: Date) => format(time, 'a h:mm', { locale: ko })
 
 const STEP = 30
 const getTimeOptions = ({ start, end }: Range) =>

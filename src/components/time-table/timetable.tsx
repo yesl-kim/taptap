@@ -41,8 +41,7 @@ const Timetable = <T extends { time: Period }>({
       repeats: [
         {
           startDate: date,
-          start: selectedTime,
-          end: addHours(selectedTime, 1),
+          times: [{ start: selectedTime, end: addHours(selectedTime, 1) }],
         },
       ],
     }

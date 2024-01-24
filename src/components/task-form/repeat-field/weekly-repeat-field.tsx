@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { format, isSameDay, getDay, isAfter } from 'date-fns'
+import { format, isSameDay, getDay, isAfter, differenceInDays } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { RepeatType } from '@prisma/client'
+import _ from 'lodash'
+
+import useToday from '@/hooks/useToday'
 
 import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
+import { TaskFormData } from '../task-form'
 
 export type RepeatFormData = {
   startDate: Date
@@ -16,27 +20,31 @@ export type RepeatFormData = {
 }
 interface Props {
   name: string
-  base?: Date
 }
 
 // TODO: 요일간 기간 복사
 // TODO: 반복 종료 날짜
-const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
-  const { register } = useFormContext()
-  const [selectedDays, setSelectedDays] = useState<Date[]>([])
+const WeeklyRepeatField = ({ name }: Props) => {
+  const { today } = useToday()
+  const {
+    register,
+    formState: { defaultValues },
+  } = useFormContext()
+  const defaultStartDate = _.get(defaultValues, `${name}.startDate`) ?? today
+  const [selectedDays, setSelectedDays] = useState<Date[]>([defaultStartDate])
 
   const selectDay = (day: Date) => {
     setSelectedDays((ds) => {
-      const i = ds.findIndex((d) => isAfter(d, day))
-      if (i < 0) {
-        return ds.concat(day)
-      }
-      return ds.slice(0, i).concat(day).concat(ds.slice(i))
+      const newDays = ds.concat(day)
+      return newDays.sort(differenceInDays)
     })
   }
 
   const unselectDay = (day: Date) => {
-    setSelectedDays((ds) => ds.filter((d) => !isSameDay(d, day)))
+    setSelectedDays((ds) => {
+      const newDays = ds.filter((d) => !isSameDay(d, day))
+      return _.isEmpty(newDays) ? ds : newDays
+    })
   }
 
   const toggleSelectDay = (day: Date) => {
@@ -50,7 +58,7 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
   return (
     <>
       <DayOfWeekSelect
-        base={base}
+        base={defaultStartDate}
         selectedDays={selectedDays}
         onClickDay={toggleSelectDay}
       />
@@ -61,7 +69,7 @@ const WeeklyRepeatField = ({ name, base = new Date() }: Props) => {
               hidden
               readOnly
               {...register(`${name}.${i}.startDate`, {
-                value: base,
+                value: defaultStartDate,
                 valueAsDate: true,
                 shouldUnregister: true,
               })}

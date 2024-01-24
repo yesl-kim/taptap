@@ -38,8 +38,8 @@ const taskFormResolver = taskFormSchema.extend({
       times: z.optional(
         z.array(
           periodDateSchema.transform(({ start, end }) => ({
-            start: format(start, 'hh:mm'),
-            end: format(end, 'hh:mm'),
+            start: format(start, 'HH:mm'),
+            end: format(end, 'HH:mm')
           }))
         )
       ),
@@ -61,7 +61,7 @@ type TaskFormProps = {
 export default function TaskForm({ categories, action, task }: TaskFormProps) {
   const context = useForm<TaskFormData>({
     defaultValues: task,
-    resolver: zodResolver(taskFormResolver),
+    resolver: zodResolver(taskFormSchema),
   })
   console.log('task: ', task)
 

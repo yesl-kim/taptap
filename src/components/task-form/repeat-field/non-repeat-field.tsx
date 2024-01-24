@@ -6,6 +6,7 @@ import { format, isSameDay } from 'date-fns'
 
 import { nestedValue } from '@/utils/parser'
 import { isEmpty } from '@/utils/validator'
+import useToday from '@/hooks/useToday'
 
 import IconButton from '@/components/icon-button'
 import PeriodFields from '@/components/period-fields'
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const NonRepeatField = ({ name }: Props) => {
+  const { today } = useToday()
   const {
     control,
     watch,
@@ -48,7 +50,7 @@ const NonRepeatField = ({ name }: Props) => {
                 <Controller
                   control={control}
                   name={`${name}.${i}.startDate`}
-                  defaultValue={new Date()}
+                  defaultValue={today}
                   rules={{
                     validate: {
                       duplicated: (cur) =>
