@@ -3,19 +3,12 @@ import _ from 'lodash'
 
 import { dateToTimestringForDB } from '@/utils/datetime'
 
-const categorySchema = z.object({
-  title: z.string(),
-})
-
 const dateSchema = z.union([z.date(), z.string().datetime()])
+
 const periodSchema = z.object({
   start: dateSchema,
   end: dateSchema,
 })
-const transformedPeriodSchema = periodSchema.transform(({ start, end }) => ({
-  start: dateToTimestringForDB(new Date(start)),
-  end: dateToTimestringForDB(new Date(end)),
-}))
 
 const repeatSchema = z.object({
   startDate: dateSchema,
@@ -28,11 +21,19 @@ const repeatSchema = z.object({
 
 type Repeat = z.infer<typeof repeatSchema>
 
-const colorSchema = z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
+const categorySchema = z.object({
+  title: z.string({ required_error: '카테고리를 선택해주세요.' }),
+})
+
+const colorSchema = z
+  .string({ required_error: '색상을 선택해주세요.' })
+  .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+    message: '올바른 색상 코드를 입력해주세요.',
+  })
 
 export const taskFormSchema = z
   .object({
-    title: z.string().min(1),
+    title: z.string().min(1, { message: '제목을 입력해주세요.' }),
     color: colorSchema,
     category: categorySchema,
     repeats: z.array(z.optional(repeatSchema)),

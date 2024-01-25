@@ -1,11 +1,18 @@
 'use client'
 
-import { KeyboardEventHandler, useCallback, useRef, useState } from 'react'
+import {
+  KeyboardEventHandler,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { useController, useFormContext } from 'react-hook-form'
 
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
+import { nestedValue } from '@/utils/parser'
 
 import BasicSelectButton from '../basic-select-button'
 
@@ -40,6 +47,7 @@ const KEY = {
   right: 'ArrowRight',
   left: 'ArrowLeft',
   enter: 'Enter',
+  tab: 'Tab',
 }
 const defaultValue = options[0]
 
@@ -49,35 +57,35 @@ interface Props {
 }
 
 export default function ColorSelect({ name }: Props) {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext()
+  const {
+    field: { value, onChange },
+  } = useController({ control, name, defaultValue: options[0] })
+
   const { on, toggle, turnOff: closeMenu, turnOn: openMenu } = useBoolean()
 
   const listRef = useRef<HTMLUListElement>(null)
   const [focusedIndex, setFocusedIndex] = useState(0)
 
   const outsideRef = useRef<HTMLDivElement>(null)
-  const close = useCallback(() => {
-    setFocusedIndex(0)
-    closeMenu()
-  }, [closeMenu])
-  useOutsideClick({ outsideRef, action: close })
-
-  const { control } = useFormContext()
-  const {
-    field: { value, onChange },
-  } = useController({ control, name, defaultValue: options[0] })
+  useOutsideClick({ outsideRef, action: closeMenu })
 
   const select = useCallback(
     (newValue: string) => {
       onChange(newValue)
-      close()
+      setFocusedIndex(options.findIndex((option) => option === newValue))
+      closeMenu()
     },
-    [close, onChange]
+    [onChange, closeMenu]
   )
 
   const selectByKeyboard: KeyboardEventHandler<HTMLDivElement> = useCallback(
     (e) => {
-      e.preventDefault()
       if (e.key === KEY.enter) {
+        e.preventDefault()
         if (!on) {
           openMenu()
           return
@@ -92,18 +100,26 @@ export default function ColorSelect({ name }: Props) {
       }
 
       if (e.key === KEY.down || e.key === KEY.right) {
+        e.preventDefault()
         setFocusedIndex((prev) => (prev + 1) % options.length)
         return
       }
 
       if (e.key === KEY.up || e.key === KEY.left) {
+        e.preventDefault()
         const lastIndex = options.length - 1
         setFocusedIndex((prev) => (prev === 0 ? lastIndex : prev - 1))
         return
       }
+
+      if (e.key === KEY.tab) {
+        closeMenu()
+      }
     },
-    [focusedIndex, select, openMenu, on]
+    [focusedIndex, select, openMenu, on, closeMenu]
   )
+
+  const errorMessage = nestedValue(`${name}.message`, errors)
 
   return (
     <div className="relative" ref={outsideRef} onKeyDown={selectByKeyboard}>
@@ -146,6 +162,8 @@ export default function ColorSelect({ name }: Props) {
           ))}
         </ul>
       )}
+
+      {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
     </div>
   )
 }

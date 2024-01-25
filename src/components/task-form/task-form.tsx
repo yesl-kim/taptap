@@ -15,6 +15,7 @@ import {
   TransformedTaskFrom,
   taskFormSchema,
 } from './taskform.types'
+import TitleInput from './title-input'
 
 const taskResponseSchema = responseSchema(z.NEVER)
 type TaskResponse = z.infer<typeof taskResponseSchema>
@@ -40,7 +41,7 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
 
   // TODO: error, loading, ... manage foram state
   const submit = async (task: TransformedTaskFrom) => {
-    console.log(task, errors)
+    console.log('submit', task, errors)
     // const promise = action(task).then((res) => {
     //   if (!res.success) {
     //     throw res.error
@@ -72,11 +73,7 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
         className="pl-24 pr-2 pt-2 max-w-xl"
       >
         <header className="mb-6">
-          <input
-            {...register('title')}
-            placeholder="제목"
-            className="text-2xl tracking-widest text-gray-600 placeholder:text-gray-600 border-b-[1px] border-b-gray-200 focus:border-b-2 focus:border-b-blue-600 transition-all focus:outline-none outline-none"
-          />
+          <TitleInput name="title" />
         </header>
         <Section Icon={CalendarIcon}>
           <div className="flex gap-2 items-center">
