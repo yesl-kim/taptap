@@ -21,24 +21,27 @@ export const userSchema = model.extend({
 })
 
 // repeat =========================================
-const timeSchema = z.string().regex(/^([01][0-9])|(2[0-4]):([0-5][0-9])$/) // hh:mm
+export const timestringSchema = z
+  .string()
+  .regex(/^([01][0-9])|(2[0-4]):([0-5][0-9])$/) // HH:mm
+export const dateSchema = z.union([z.date(), z.string().datetime()])
 
 export const periodStringSchema = z.object({
-  start: timeSchema,
-  end: timeSchema,
+  start: timestringSchema,
+  end: timestringSchema,
 })
 
 export type PeriodString = z.infer<typeof periodStringSchema>
 
 export const periodDateSchema = z.object({
-  start: z.date(),
-  end: z.date(),
+  start: dateSchema,
+  end: dateSchema,
 })
 
 export type Period = z.infer<typeof periodDateSchema>
 
 export const repeatSchema = model.extend({
-  startDate: z.date(),
+  startDate: dateSchema,
   endDate: z.optional(z.date()),
   times: z.optional(z.array(periodStringSchema)),
   type: z.optional(z.enum(['Daily', 'Weekly', 'Monthly', 'Yearly'])),

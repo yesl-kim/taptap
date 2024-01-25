@@ -3,88 +3,66 @@
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { addHours, format } from 'date-fns'
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
-import toast from 'react-hot-toast'
-import { Prisma } from '@prisma/client'
 
-import {
-  categoryCreateInputSchema,
-  taskCreateInputSchema,
-  categoryUpdateInputSchema,
-  repeatCreateInputSchema,
-  periodDateSchema,
-  taskSchema,
-} from '@/types/schema'
 import { responseSchema } from '@/types/api'
-import useToday from '@/hooks/useToday'
 
 import ColorSelect from './color-select'
 import RepeatField from './repeat-field/repeat-field'
 import CategorySelect, { Category } from './category-select'
+import {
+  TaskFormField,
+  TransformedTaskFrom,
+  taskFormSchema,
+} from './taskform.types'
 
-const repeatWithDateTimesSchema = repeatCreateInputSchema.extend({
-  times: z.nullable(z.array(periodDateSchema)),
-})
-
-const taskFormSchema = taskCreateInputSchema.extend({
-  category: categoryCreateInputSchema,
-  repeats: z.array(repeatWithDateTimesSchema),
-})
-
-const taskFormResolver = taskFormSchema.extend({
-  repeats: z.array(
-    repeatWithDateTimesSchema.extend({
-      times: z.optional(
-        z.array(
-          periodDateSchema.transform(({ start, end }) => ({
-            start: format(start, 'HH:mm'),
-            end: format(end, 'HH:mm')
-          }))
-        )
-      ),
-    })
-  ),
-})
-
-export type TaskFormData = z.infer<typeof taskFormSchema>
-type parsedTaskFormData = z.infer<typeof taskFormResolver>
 const taskResponseSchema = responseSchema(z.NEVER)
 type TaskResponse = z.infer<typeof taskResponseSchema>
 
 type TaskFormProps = {
   categories: Category[]
-  action: (data: parsedTaskFormData) => Promise<TaskResponse> // response 타입 통일?
-  task?: TaskFormData
+  action: (data: TransformedTaskFrom) => Promise<TaskResponse> // response 타입 통일?
+  task?: TaskFormField
 }
 
 export default function TaskForm({ categories, action, task }: TaskFormProps) {
-  const context = useForm<TaskFormData>({
+  const context = useForm<TaskFormField, any, TransformedTaskFrom>({
     defaultValues: task,
     resolver: zodResolver(taskFormSchema),
   })
-  console.log('task: ', task)
 
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
+    watch,
   } = context
 
   // TODO: error, loading, ... manage foram state
-  const submit = async (task: parsedTaskFormData) => {
+  const submit = async (task: TransformedTaskFrom) => {
     console.log(task, errors)
-    const promise = action(task).then((res) => {
-      if (!res.success) {
-        throw res.error
-      }
-    })
+    // const promise = action(task).then((res) => {
+    //   if (!res.success) {
+    //     throw res.error
+    //   }
+    // })
 
-    toast.promise(promise, {
-      loading: '저장 중...',
-      success: '일정이 저장되었습니다.',
-      error: (message) => message,
-    })
+    // toast.promise(promise, {
+    //   loading: '저장 중...',
+    //   success: '일정이 저장되었습니다.',
+    //   error: (message) => message,
+    // })
+  }
+
+  const value = watch()
+  const log = () => {
+    try {
+      const v = JSON.stringify(value, ['repeats'], 2)
+      console.log(errors)
+      console.log(v)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   return (
@@ -119,6 +97,8 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
           </button>
         </footer>
       </form>
+      <pre>{JSON.stringify(value, undefined, '\t')}</pre>
+      <div onClick={log}>log error, value</div>
     </FormProvider>
   )
 }

@@ -1,6 +1,13 @@
-import { useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { format, isSameDay, getDay, isAfter, differenceInDays } from 'date-fns'
+import {
+  format,
+  isSameDay,
+  getDay,
+  isAfter,
+  differenceInDays,
+  getDate,
+} from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { RepeatType } from '@prisma/client'
 import _ from 'lodash'
@@ -10,7 +17,6 @@ import useToday from '@/hooks/useToday'
 import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
-import { TaskFormData } from '../task-form'
 
 export type RepeatFormData = {
   startDate: Date
@@ -27,7 +33,6 @@ interface Props {
 const WeeklyRepeatField = ({ name }: Props) => {
   const { today } = useToday()
   const {
-    register,
     formState: { defaultValues },
   } = useFormContext()
   const defaultStartDate = _.get(defaultValues, `${name}.startDate`) ?? today
@@ -54,7 +59,6 @@ const WeeklyRepeatField = ({ name }: Props) => {
       selectDay(day)
     }
   }
-
   return (
     <>
       <DayOfWeekSelect
@@ -63,44 +67,60 @@ const WeeklyRepeatField = ({ name }: Props) => {
         onClickDay={toggleSelectDay}
       />
       <div className="mt-2">
-        {selectedDays.map((date, i) => (
-          <div key={date.toString()} className="flex gap-2 items-center">
-            <input
-              hidden
-              readOnly
-              {...register(`${name}.${i}.startDate`, {
-                value: defaultStartDate,
-                valueAsDate: true,
-                shouldUnregister: true,
-              })}
+        {selectedDays.map((date) => {
+          const day = getDay(date)
+          return (
+            <DayOfWeekRepeatField
+              key={day}
+              name={`${name}.${day}`}
+              selectedDate={date}
+              startDate={defaultStartDate}
             />
-            <input
-              hidden
-              readOnly
-              {...register(`${name}.${i}.type`, { value: RepeatType.Weekly })}
-            />
-            <input
-              hidden
-              readOnly
-              {...register(`${name}.${i}.interval`, { value: 1 })}
-            />
-            <input
-              hidden
-              readOnly
-              {...register(`${name}.${i}.daysOfWeek`, {
-                value: [getDay(date)],
-                shouldUnregister: true,
-              })}
-            />
-            <span className="text-gray-900 basis-10">
-              {format(date, 'E', { locale: ko })}
-            </span>
-            <PeriodFields name={`${name}.${i}.times`} />
-          </div>
-        ))}
+          )
+        })}
       </div>
     </>
   )
 }
 
 export default WeeklyRepeatField
+
+type DayOfWeekRepeatFieldProps = {
+  name: string
+  startDate: Date
+  selectedDate: Date
+}
+
+const DayOfWeekRepeatField = memo(
+  ({ name, startDate, selectedDate }: DayOfWeekRepeatFieldProps) => {
+    const { register, unregister } = useFormContext()
+
+    useEffect(() => {
+      register(`${name}.startDate`, {
+        value: startDate,
+        valueAsDate: true,
+      })
+      register(`${name}.type`, {
+        value: RepeatType.Weekly,
+      })
+      register(`${name}.interval`, {
+        value: 1,
+      })
+      register(`${name}.daysOfWeek`, {
+        value: [getDay(selectedDate)],
+      })
+      return () => unregister(name)
+    }, [name, selectedDate, startDate, register, unregister])
+
+    return (
+      <div className="flex gap-2">
+        <span className="text-gray-900 basis-10 max-h-[40px] flex items-center">
+          {format(selectedDate, 'E', { locale: ko })}
+        </span>
+        <PeriodFields name={`${name}.times`} />
+      </div>
+    )
+  }
+)
+
+DayOfWeekRepeatField.displayName = 'DayOfWeekRepeatField'
