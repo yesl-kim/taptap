@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import _ from 'lodash'
-import { isAfter } from 'date-fns'
+import { isAfter, isSameDay, startOfDay } from 'date-fns'
 
 import { dateToTimestringForDB } from '@/utils/datetime'
 
@@ -38,13 +38,41 @@ const timesSchema = z.array(periodSchema).superRefine((times, ctx) => {
 })
 
 const repeatSchema = z.object({
-  startDate: dateSchema,
+  startDate: dateSchema.refine(
+    (date) => isSameDay(date, new Date()) || isAfter(date, new Date()),
+    {
+      message: '과거의 날짜는 추가할 수 없습니다.',
+    }
+  ),
   endDate: z.optional(dateSchema),
   times: z.optional(timesSchema),
   interval: z.optional(z.number().int().positive()),
   type: z.optional(z.enum(['Daily', 'Weekly', 'Monthly', 'Yearly'])),
-  daysOfWeek: z.array(z.number().int().gte(0).lte(6)),
+  daysOfWeek: z.array(z.number().int().gte(0).lte(6)).optional(),
 })
+
+const repeatsSchema = z
+  .array(z.optional(repeatSchema))
+  .superRefine((repeats, ctx) => {
+    const indices = {} as { [key: string]: number[] }
+    repeats.forEach((repeat, i) => {
+      if (!repeat || repeat?.type) return
+
+      const key = startOfDay(repeat.startDate).toString()
+      indices[key] = _.get(indices, key, [] as number[]).concat(i)
+    })
+
+    for (const idxs of Object.values(indices)) {
+      if (idxs.length < 2) continue
+      for (const i of idxs) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '같은 날짜가 2번 이상 추가되었습니다.',
+          path: [i, 'startDate'],
+        })
+      }
+    }
+  })
 
 type Repeat = z.infer<typeof repeatSchema>
 
@@ -63,7 +91,7 @@ export const taskFormSchema = z
     title: z.string().min(1, { message: '제목을 입력해주세요.' }),
     color: colorSchema,
     category: categorySchema,
-    repeats: z.array(z.optional(repeatSchema)),
+    repeats: repeatsSchema,
   })
   .transform(({ repeats, ...task }) => ({
     ...task,

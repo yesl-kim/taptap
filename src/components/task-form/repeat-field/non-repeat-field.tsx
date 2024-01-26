@@ -51,15 +51,6 @@ const NonRepeatField = ({ name }: Props) => {
                   control={control}
                   name={`${name}.${i}.startDate`}
                   defaultValue={today}
-                  rules={{
-                    validate: {
-                      duplicated: (cur) =>
-                        value.every(
-                          ({ startDate: other }, j) =>
-                            i === j || !isSameDay(cur, other)
-                        ) || '같은 날짜가 2번 이상 추가되었습니다.',
-                    },
-                  }}
                   render={({ field: startDate }) => (
                     <Menu as="div" className="relative">
                       <Menu.Button className="px-3 py-2 rounded transition-all outline-none focus:outline-none focus:bg-neutral-200 text-sm text-gray-600 hover:bg-neutral-100">
