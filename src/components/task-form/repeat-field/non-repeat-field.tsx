@@ -91,13 +91,27 @@ const NonRepeatField = ({ name }: Props) => {
           )
         })}
       </div>
-      <button
-        type="button"
-        className="p-2 rounded text-blue-600 text-sm hover:bg-blue-50/70"
-        onClick={() => append({ startDate: new Date(), times: [] })}
-      >
-        날짜 추가
-      </button>
+      <Menu as="div" className="relative">
+        <Menu.Button
+          type="button"
+          className="p-2 rounded text-blue-600 text-sm hover:bg-blue-50/70"
+        >
+          날짜 추가
+        </Menu.Button>
+        <Menu.Items className="absolute mt-2 bg-white z-10 pb-2 shadow-md rounded">
+          <Menu.Item>
+            {({ close }) => (
+              <Calendar
+                selectedDate={today}
+                onChange={(date) => {
+                  append({ startDate: date, times: [] })
+                  close()
+                }}
+              />
+            )}
+          </Menu.Item>
+        </Menu.Items>
+      </Menu>
     </div>
   )
 }
