@@ -1,19 +1,46 @@
 import { z } from 'zod'
 import _ from 'lodash'
+import { isAfter } from 'date-fns'
 
 import { dateToTimestringForDB } from '@/utils/datetime'
 
 const dateSchema = z.union([z.date(), z.string().datetime()])
 
-const periodSchema = z.object({
-  start: dateSchema,
-  end: dateSchema,
+const periodSchema = z
+  .object({
+    start: dateSchema,
+    end: dateSchema,
+  })
+  .superRefine(({ start, end }, ctx) => {
+    if (isAfter(end, start)) return
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '시작 시간은 종료 시간 이전이어야 합니다.',
+      path: ['end'],
+    })
+  })
+
+const timesSchema = z.array(periodSchema).superRefine((times, ctx) => {
+  if (times.length <= 1) return
+
+  for (let i = 1; i < times.length; i++) {
+    const prev = times[i - 1]
+    const cur = times[i]
+    if (isAfter(cur.start, prev.end)) continue
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [i, 'start'],
+      message: '기간은 겹칠 수 없습니다.',
+    })
+    return z.NEVER
+  }
 })
 
 const repeatSchema = z.object({
   startDate: dateSchema,
   endDate: z.optional(dateSchema),
-  times: z.optional(z.array(periodSchema)),
+  times: z.optional(timesSchema),
   interval: z.optional(z.number().int().positive()),
   type: z.optional(z.enum(['Daily', 'Weekly', 'Monthly', 'Yearly'])),
   daysOfWeek: z.array(z.number().int().gte(0).lte(6)),

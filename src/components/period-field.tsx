@@ -39,6 +39,7 @@ const PeriodField = ({ name, range }: Props) => {
   )
 
   const errorMessage =
+    nestedValue(`${name}.root.message`, errors) ||
     nestedValue(`${name}.start.message`, errors) ||
     nestedValue(`${name}.end.message`, errors)
 
@@ -48,13 +49,6 @@ const PeriodField = ({ name, range }: Props) => {
         <Controller
           name={`${name}.start`}
           control={control}
-          rules={{
-            required: true,
-            validate: (v: Date) =>
-              isBefore(range.start, v) ||
-              isSameMinute(range.start, v) ||
-              '기간은 겹칠 수 없습니다.',
-          }}
           defaultValue={defaultValue.start}
           render={({ field: { ref, onChange, ...props } }) => (
             <TimeSelect
