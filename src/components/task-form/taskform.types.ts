@@ -1,10 +1,12 @@
 import { z } from 'zod'
 import _ from 'lodash'
 import { isAfter, isSameDay, startOfDay } from 'date-fns'
+import { RepeatType } from '@prisma/client'
 
 import { dateToTimestringForDB } from '@/utils/datetime'
 
 const dateSchema = z.union([z.date(), z.string().datetime()])
+type DateType = z.infer<typeof dateSchema>
 
 const periodSchema = z
   .object({
@@ -38,27 +40,24 @@ const timesSchema = z.array(periodSchema).superRefine((times, ctx) => {
 })
 
 const repeatSchema = z.object({
-  startDate: dateSchema.refine(
-    (date) => isSameDay(date, new Date()) || isAfter(date, new Date()),
-    {
-      message: '과거의 날짜는 추가할 수 없습니다.',
-    }
-  ),
-  endDate: z.optional(dateSchema),
   times: z.optional(timesSchema),
-  interval: z.optional(z.number().int().positive()),
-  type: z.optional(z.enum(['Daily', 'Weekly', 'Monthly', 'Yearly'])),
-  daysOfWeek: z.array(z.number().int().gte(0).lte(6)).optional(),
 })
 
-const repeatsSchema = z
-  .array(z.optional(repeatSchema))
+const nonRepeatFieldSchema = repeatSchema
+  .extend({
+    startDate: dateSchema.refine(
+      (date) => isSameDay(date, new Date()) || isAfter(date, new Date()),
+      {
+        message: '과거의 날짜는 추가할 수 없습니다.',
+      }
+    ),
+  })
+  .array()
+  .nonempty({ message: '날짜를 선택해주세요.' })
   .superRefine((repeats, ctx) => {
     const indices = {} as { [key: string]: number[] }
-    repeats.forEach((repeat, i) => {
-      if (!repeat || repeat?.type) return
-
-      const key = startOfDay(repeat.startDate).toString()
+    repeats.forEach(({ startDate }, i) => {
+      const key = startOfDay(startDate).toString()
       indices[key] = _.get(indices, key, [] as number[]).concat(i)
     })
 
@@ -74,7 +73,41 @@ const repeatsSchema = z
     }
   })
 
-type Repeat = z.infer<typeof repeatSchema>
+const weeklyRepeatSchema = repeatSchema.extend({
+  interval: z.number().int().positive(),
+  daysOfWeek: z.array(z.number().int().gte(0).lte(6)).optional(),
+})
+
+const weeklyRepeatFieldSchema = weeklyRepeatSchema.optional().array().nonempty()
+
+const repeatPayloadSchema = z
+  .object({
+    non: nonRepeatFieldSchema,
+    weekly: weeklyRepeatFieldSchema,
+  })
+  .partial()
+
+export const repeatTypeValues = z.enum(['None', 'Weekly'])
+export type RepeatTypeValues = z.infer<typeof repeatTypeValues>
+
+const repeatFieldSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal(repeatTypeValues.enum.None),
+    data: repeatPayloadSchema.required({
+      non: true,
+    }),
+  }),
+  z.object({
+    type: z.literal(repeatTypeValues.enum.Weekly),
+    startDate: dateSchema,
+    endDate: dateSchema.optional(),
+    data: repeatPayloadSchema.required({
+      weekly: true,
+    }),
+  }),
+])
+
+type WeeklyRepeat = z.infer<typeof weeklyRepeatSchema>
 
 const categorySchema = z.object({
   title: z.string({ required_error: '카테고리를 선택해주세요.' }),
@@ -86,26 +119,38 @@ const colorSchema = z
     message: '올바른 색상 코드를 입력해주세요.',
   })
 
+const isExist = (repeat?: WeeklyRepeat): repeat is WeeklyRepeat =>
+  Boolean(repeat)
+
 export const taskFormSchema = z
   .object({
     title: z.string().min(1, { message: '제목을 입력해주세요.' }),
     color: colorSchema,
     category: categorySchema,
-    repeats: repeatsSchema,
+    repeat: repeatFieldSchema,
+  })
+  .transform(({ repeat, ...task }) => {
+    const { type, data } = repeat
+    const repeats =
+      type === repeatTypeValues.enum.None
+        ? data.non
+        : data.weekly
+            .filter(isExist)
+            .map((option) => ({ ...repeat, ...option }))
+
+    return { ...task, repeats }
   })
   .transform(({ repeats, ...task }) => ({
     ...task,
-    repeats: repeats
-      .filter((r): r is Repeat => Boolean(r))
-      .map(({ times, ...r }) => ({
-        ...r,
-        times:
-          times &&
-          times.map(({ start, end }) => ({
-            start: dateToTimestringForDB(new Date(start)),
-            end: dateToTimestringForDB(new Date(end)),
-          })),
-      })),
+    repeats: repeats.map(({ times, ...r }) => ({
+      ...r,
+      times:
+        times &&
+        times.map(({ start, end }) => ({
+          start: dateToTimestringForDB(new Date(start)),
+          end: dateToTimestringForDB(new Date(end)),
+        })),
+    })),
   }))
 
 export type TaskFormField = z.input<typeof taskFormSchema>

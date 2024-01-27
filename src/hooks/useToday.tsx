@@ -59,10 +59,6 @@ export const TodayContextProvider = ({
     return () => clearTimeout(id)
   }, [today, getStartOfDay])
 
-  useEffect(() => {
-    console.log('today', format(today, 'MM.dd HH:mm', { locale: ko }))
-  }, [today])
-
   const value = useMemo(
     () => ({ today, getStartOfDay, offset, setOffset, getEndOfDay }),
     [today, offset, getStartOfDay, getEndOfDay]

@@ -1,15 +1,7 @@
 import { memo, useEffect, useState } from 'react'
-import { useFormContext } from 'react-hook-form'
-import {
-  format,
-  isSameDay,
-  getDay,
-  isAfter,
-  differenceInDays,
-  getDate,
-} from 'date-fns'
+import { Controller, useFormContext } from 'react-hook-form'
+import { format, isSameDay, getDay, differenceInDays } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { RepeatType } from '@prisma/client'
 import _ from 'lodash'
 
 import useToday from '@/hooks/useToday'
@@ -17,6 +9,7 @@ import useToday from '@/hooks/useToday'
 import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
+import EndDateField from './end-date-field'
 
 export type RepeatFormData = {
   startDate: Date
@@ -29,14 +22,16 @@ interface Props {
 }
 
 // TODO: 요일간 기간 복사
-// TODO: 반복 종료 날짜
+// name = 'repeat'
 const WeeklyRepeatField = ({ name }: Props) => {
   const { today } = useToday()
+
   const {
     formState: { defaultValues },
   } = useFormContext()
-  const defaultStartDate = _.get(defaultValues, `${name}.startDate`) ?? today
-  const [selectedDays, setSelectedDays] = useState<Date[]>([defaultStartDate])
+
+  const startDate = _.get(defaultValues, 'repeat.startDate') ?? today
+  const [selectedDays, setSelectedDays] = useState<Date[]>([startDate])
 
   const selectDay = (day: Date) => {
     setSelectedDays((ds) => {
@@ -59,26 +54,27 @@ const WeeklyRepeatField = ({ name }: Props) => {
       selectDay(day)
     }
   }
+
   return (
     <>
       <DayOfWeekSelect
-        base={defaultStartDate}
+        base={startDate}
         selectedDays={selectedDays}
         onClickDay={toggleSelectDay}
       />
-      <div className="mt-2">
+      <div className="my-2">
         {selectedDays.map((date) => {
           const day = getDay(date)
           return (
             <DayOfWeekRepeatField
               key={day}
-              name={`${name}.${day}`}
+              name={`repeat.data.weekly.${day}`}
               selectedDate={date}
-              startDate={defaultStartDate}
             />
           )
         })}
       </div>
+      <EndDateField />
     </>
   )
 }
@@ -87,22 +83,14 @@ export default WeeklyRepeatField
 
 type DayOfWeekRepeatFieldProps = {
   name: string
-  startDate: Date
   selectedDate: Date
 }
 
 const DayOfWeekRepeatField = memo(
-  ({ name, startDate, selectedDate }: DayOfWeekRepeatFieldProps) => {
+  ({ name, selectedDate }: DayOfWeekRepeatFieldProps) => {
     const { register, unregister } = useFormContext()
 
     useEffect(() => {
-      register(`${name}.startDate`, {
-        value: startDate,
-        valueAsDate: true,
-      })
-      register(`${name}.type`, {
-        value: RepeatType.Weekly,
-      })
       register(`${name}.interval`, {
         value: 1,
       })
@@ -110,7 +98,7 @@ const DayOfWeekRepeatField = memo(
         value: [getDay(selectedDate)],
       })
       return () => unregister(name)
-    }, [name, selectedDate, startDate, register, unregister])
+    }, [name, selectedDate, register, unregister])
 
     return (
       <div className="flex gap-2">

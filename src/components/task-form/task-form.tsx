@@ -4,15 +4,19 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
+import { RepeatType } from '@prisma/client'
 
 import { responseSchema } from '@/types/api'
+import useToday from '@/hooks/useToday'
 
 import ColorSelect from './color-select'
 import RepeatField from './repeat-field/repeat-field'
 import CategorySelect, { Category } from './category-select'
 import {
+  DefaultTaskFormField,
   TaskFormField,
   TransformedTaskFrom,
+  repeatTypeValues,
   taskFormSchema,
 } from './taskform.types'
 import TitleInput from './title-input'
@@ -27,9 +31,24 @@ type TaskFormProps = {
 }
 
 export default function TaskForm({ categories, action, task }: TaskFormProps) {
+  const { today } = useToday()
+  const defaultValue = {
+    repeat: {
+      type: repeatTypeValues.Values.None,
+      data: {
+        non: [
+          {
+            startDate: today,
+          },
+        ],
+      },
+    },
+  }
+
   const context = useForm<TaskFormField, any, TransformedTaskFrom>({
-    defaultValues: task,
+    defaultValues: task ?? defaultValue,
     resolver: zodResolver(taskFormSchema),
+    mode: 'onChange',
   })
 
   const {
@@ -56,15 +75,6 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
   }
 
   const value = watch()
-  const log = () => {
-    try {
-      const v = JSON.stringify(value, ['repeats'], 2)
-      console.log(errors)
-      console.log(v)
-    } catch (e) {
-      console.log(e)
-    }
-  }
 
   return (
     <FormProvider {...context}>
@@ -95,7 +105,6 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
         </footer>
       </form>
       <pre>{JSON.stringify(value, undefined, '\t')}</pre>
-      <div onClick={log}>log error, value</div>
     </FormProvider>
   )
 }

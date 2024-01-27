@@ -10,7 +10,7 @@ import IconButton from '@/components/icon-button'
 import DateCell from './date-cell'
 
 interface Props {
-  selectedDate: Date
+  selectedDate?: string | number | Date
   onChange: (date: Date) => void
 }
 
@@ -53,7 +53,9 @@ const Calendar = forwardRef<HTMLDivElement, Props>(
                     <td key={key}>
                       <DateCell
                         value={value}
-                        active={isSameDay(value, selectedDate)}
+                        active={
+                          !!selectedDate && isSameDay(value, selectedDate)
+                        }
                         onClick={onChange}
                         isCurrentMonth={isCurrentMonth}
                       />
