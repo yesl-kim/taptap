@@ -1,12 +1,10 @@
 import { z } from 'zod'
 import _ from 'lodash'
 import { isAfter, isSameDay, startOfDay } from 'date-fns'
-import { RepeatType } from '@prisma/client'
 
 import { dateToTimestringForDB } from '@/utils/datetime'
 
 const dateSchema = z.union([z.date(), z.string().datetime()])
-type DateType = z.infer<typeof dateSchema>
 
 const periodSchema = z
   .object({
@@ -21,6 +19,8 @@ const periodSchema = z
       path: ['end'],
     })
   })
+
+export type PeriodType = z.infer<typeof periodSchema>
 
 const timesSchema = z.array(periodSchema).superRefine((times, ctx) => {
   if (times.length <= 1) return

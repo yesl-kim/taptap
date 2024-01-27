@@ -13,8 +13,6 @@ const TitleInput = ({ name }: TitleInputProps) => {
     formState: { errors },
   } = useFormContext()
   const errorMessage = nestedValue(`${name}.message`, errors)
-  console.log(errors)
-  console.log(errorMessage)
 
   return (
     <div>

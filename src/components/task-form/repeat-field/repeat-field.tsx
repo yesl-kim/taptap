@@ -34,7 +34,7 @@ const options: Options = {
   Weekly: {
     label: '매주 반복',
     value: repeatTypeValues.Values.Weekly,
-    field: <WeeklyRepeatField name="repeat" />,
+    field: <WeeklyRepeatField />,
   },
 }
 

@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { RepeatType } from '@prisma/client'
+import toast from 'react-hot-toast'
 
 import { responseSchema } from '@/types/api'
 import useToday from '@/hooks/useToday'
@@ -13,7 +14,6 @@ import ColorSelect from './color-select'
 import RepeatField from './repeat-field/repeat-field'
 import CategorySelect, { Category } from './category-select'
 import {
-  DefaultTaskFormField,
   TaskFormField,
   TransformedTaskFrom,
   repeatTypeValues,
@@ -53,28 +53,23 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
 
   const {
     handleSubmit,
-    register,
     formState: { errors, isSubmitting },
-    watch,
   } = context
 
-  // TODO: error, loading, ... manage foram state
   const submit = async (task: TransformedTaskFrom) => {
     console.log('submit', task, errors)
-    // const promise = action(task).then((res) => {
-    //   if (!res.success) {
-    //     throw res.error
-    //   }
-    // })
+    const promise = action(task).then((res) => {
+      if (!res.success) {
+        throw res.error
+      }
+    })
 
-    // toast.promise(promise, {
-    //   loading: '저장 중...',
-    //   success: '일정이 저장되었습니다.',
-    //   error: (message) => message,
-    // })
+    toast.promise(promise, {
+      loading: '저장 중...',
+      success: '일정이 저장되었습니다.',
+      error: (message) => message,
+    })
   }
-
-  const value = watch()
 
   return (
     <FormProvider {...context}>
@@ -104,7 +99,6 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
           </button>
         </footer>
       </form>
-      <pre>{JSON.stringify(value, undefined, '\t')}</pre>
     </FormProvider>
   )
 }

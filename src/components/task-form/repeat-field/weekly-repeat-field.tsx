@@ -3,6 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 import { format, isSameDay, getDay, differenceInDays } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import _ from 'lodash'
+import { Square2StackIcon } from '@heroicons/react/24/outline'
 
 import useToday from '@/hooks/useToday'
 
@@ -10,6 +11,8 @@ import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
 import EndDateField from './end-date-field'
+import { PeriodType } from '../taskform.types'
+import IconButton from '@/components/icon-button'
 
 export type RepeatFormData = {
   startDate: Date
@@ -17,17 +20,14 @@ export type RepeatFormData = {
   daysOfMonth?: number[]
   endDate?: Date
 }
-interface Props {
-  name: string
-}
 
-// TODO: 요일간 기간 복사
 // name = 'repeat'
-const WeeklyRepeatField = ({ name }: Props) => {
+const WeeklyRepeatField = () => {
   const { today } = useToday()
 
   const {
     formState: { defaultValues },
+    setValue,
   } = useFormContext()
 
   const startDate = _.get(defaultValues, 'repeat.startDate') ?? today
@@ -55,6 +55,13 @@ const WeeklyRepeatField = ({ name }: Props) => {
     }
   }
 
+  const 요일간기간복사 = (value: PeriodType[]): void => {
+    selectedDays.forEach((date) => {
+      const name = `repeat.data.weekly.${getDay(date)}.times` // FIXME
+      setValue(name, value)
+    })
+  }
+
   return (
     <>
       <DayOfWeekSelect
@@ -70,6 +77,7 @@ const WeeklyRepeatField = ({ name }: Props) => {
               key={day}
               name={`repeat.data.weekly.${day}`}
               selectedDate={date}
+              copy={요일간기간복사}
             />
           )
         })}
@@ -84,11 +92,17 @@ export default WeeklyRepeatField
 type DayOfWeekRepeatFieldProps = {
   name: string
   selectedDate: Date
+  copy: (times: PeriodType[]) => void
 }
 
 const DayOfWeekRepeatField = memo(
-  ({ name, selectedDate }: DayOfWeekRepeatFieldProps) => {
-    const { register, unregister } = useFormContext()
+  ({ name, selectedDate, copy }: DayOfWeekRepeatFieldProps) => {
+    const { register, unregister, getValues } = useFormContext()
+
+    const onCopy = () => {
+      const times = getValues(`${name}.times`)
+      copy(times)
+    }
 
     useEffect(() => {
       register(`${name}.interval`, {
@@ -101,11 +115,19 @@ const DayOfWeekRepeatField = memo(
     }, [name, selectedDate, register, unregister])
 
     return (
-      <div className="flex gap-2">
+      <div className="flex gap-2 group">
         <span className="text-gray-900 basis-10 max-h-[40px] flex items-center">
           {format(selectedDate, 'E', { locale: ko })}
         </span>
         <PeriodFields name={`${name}.times`} />
+        <div className="max-h-[40px] flex items-center group-only:hidden">
+          <IconButton
+            type="button"
+            onClick={onCopy}
+            Icon={Square2StackIcon}
+            label="모든 요일에 기간 복사"
+          />
+        </div>
       </div>
     )
   }
