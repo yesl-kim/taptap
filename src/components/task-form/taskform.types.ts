@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { isAfter, isSameDay, startOfDay } from 'date-fns'
 
 import { dateToTimestringForDB } from '@/utils/datetime'
+import { colorSchema } from '@/types/schema'
 
 const dateSchema = z.union([z.date(), z.string().datetime()])
 
@@ -49,7 +50,7 @@ const nonRepeatFieldSchema = repeatSchema
       (date) => isSameDay(date, new Date()) || isAfter(date, new Date()),
       {
         message: '과거의 날짜는 추가할 수 없습니다.',
-      }
+      },
     ),
   })
   .array()
@@ -112,12 +113,6 @@ type WeeklyRepeat = z.infer<typeof weeklyRepeatSchema>
 const categorySchema = z.object({
   title: z.string({ required_error: '카테고리를 선택해주세요.' }),
 })
-
-const colorSchema = z
-  .string({ required_error: '색상을 선택해주세요.' })
-  .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-    message: '올바른 색상 코드를 입력해주세요.',
-  })
 
 const isExist = (repeat?: WeeklyRepeat): repeat is WeeklyRepeat =>
   Boolean(repeat)

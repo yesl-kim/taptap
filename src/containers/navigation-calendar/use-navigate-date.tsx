@@ -5,7 +5,7 @@ import {
   dateParamsSchema,
   dateToParams,
   parmasToDate,
-} from './navigation-calendar.util'
+} from './navigation-calendar.utils'
 
 const useNavigateDate = () => {
   const router = useRouter()

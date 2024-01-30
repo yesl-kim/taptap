@@ -20,6 +20,13 @@ export const userSchema = model.extend({
   email: z.string(),
 })
 
+// scalar =======================================
+export const colorSchema = z
+  .string({ required_error: '색상을 선택해주세요.' })
+  .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+    message: '올바른 색상 코드를 입력해주세요.',
+  })
+
 // repeat =========================================
 export const timestringSchema = z
   .string()

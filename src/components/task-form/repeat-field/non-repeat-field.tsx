@@ -1,26 +1,17 @@
 import { useEffect } from 'react'
-import {
-  useFieldArray,
-  useFormContext,
-  Controller,
-  useController,
-} from 'react-hook-form'
+import { useFieldArray, useFormContext, Controller } from 'react-hook-form'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Menu } from '@headlessui/react'
-import { format, isSameDay } from 'date-fns'
 import _ from 'lodash'
 
-import { nestedValue } from '@/utils/parser'
-import { isEmpty } from '@/utils/validator'
 import useToday from '@/hooks/useToday'
 
 import IconButton from '@/components/icon-button'
 import PeriodFields from '@/components/period-fields'
 import Calendar from '@/components/calendar/calendar'
-import { RepeatFormData } from './weekly-repeat-field'
 import DateSelect from '@/components/date-select'
 import { TaskFormField } from '../taskform.types'
-import ErrorWrapper from '../error-wrapper'
+import ErrorWrapper from '@/components/error-wrapper'
 
 interface Props {
   name: string
@@ -84,11 +75,11 @@ const NonRepeatField = () => {
       <Menu as="div" className="relative">
         <Menu.Button
           type="button"
-          className="p-2 rounded text-blue-600 text-sm hover:bg-blue-50/70"
+          className="rounded p-2 text-sm text-blue-600 hover:bg-blue-50/70"
         >
           날짜 추가
         </Menu.Button>
-        <Menu.Items className="absolute mt-2 bg-white z-10 pb-2 shadow-md rounded">
+        <Menu.Items className="absolute z-10 mt-2 rounded bg-white pb-2 shadow-md">
           <Menu.Item>
             {({ close }) => (
               <Calendar

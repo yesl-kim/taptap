@@ -42,7 +42,7 @@ const TaskTimeBlock = ({ task, date }: TaskTimeBlockProps) => {
   return (
     <Popover className="relative">
       <Popover.Button
-        className="flex w-full rounded pt-0.5 pr-2 overflow-hidden text-white whitespace-nowrap break-words text-ellipsis opacity-50"
+        className="flex w-full overflow-hidden text-ellipsis whitespace-nowrap break-words rounded pr-2 pt-0.5 text-white opacity-50"
         style={{ backgroundColor: color }}
       >
         <span>{title}</span>
@@ -60,13 +60,13 @@ const TaskTimeBlock = ({ task, date }: TaskTimeBlockProps) => {
               <ListItem
                 before={
                   <i
-                    className="block w-[17px] h-[17px] rounded"
+                    className="block h-[17px] w-[17px] rounded"
                     style={{ backgroundColor: color }}
                   />
                 }
               >
-                <p className="text-gray-700 text-xl mb-1">{title}</p>
-                <p className="flex gap-2 text-gray-500 text-xs">
+                <p className="mb-1 text-xl text-gray-700">{title}</p>
+                <p className="flex gap-2 text-xs text-gray-500">
                   <span>{format(date, 'm월 d일 (EEEE)', { locale: ko })}</span>
                   <span>&#183;</span>
                   {time && <span>{intervalToString(time)}</span>}
