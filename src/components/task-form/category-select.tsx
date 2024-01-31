@@ -1,8 +1,15 @@
 'use client'
 
-import { useState, useRef, MouseEventHandler } from 'react'
+import {
+  useState,
+  useRef,
+  MouseEventHandler,
+  memo,
+  useCallback,
+  useMemo,
+  forwardRef,
+} from 'react'
 import { Combobox } from '@headlessui/react'
-import { useController, useFormContext } from 'react-hook-form'
 import {
   ChevronDownIcon,
   CheckIcon,
@@ -11,65 +18,68 @@ import {
 
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
-import { nestedValue } from '@/utils/parser'
 
 import BasicSelectButton from '@/components/basic-select-button'
+import FieldError from '../field-error'
 
 export type Category = {
-  id: string
   title: string
 }
 
 interface Props {
   categories: Category[]
-  name: string
+  onChange: (c: Category) => void
+  value?: Category
+  error?: string
 }
 
-const CategorySelect = ({ categories, name }: Props) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext()
-  const {
-    field: { value, onChange },
-  } = useController({
-    control,
-    name,
-    defaultValue: {},
-  })
-
-  const { on, turnOff: close, turnOn: open } = useBoolean()
-  const combobox = useRef<HTMLDivElement>(null)
+const CategorySelect = forwardRef<HTMLButtonElement, Props>(({ categories, value, onChange, error }, buttonRef) => {
   const input = useRef<HTMLInputElement>(null)
+  const combobox = useRef<HTMLDivElement>(null)
+  const { on, turnOff: close, turnOn: open } = useBoolean()
+
   useOutsideClick({ outsideRef: combobox, action: close })
 
   const [query, setQuery] = useState('')
-  const filteredCategories = !query
-    ? categories
-    : categories.filter(({ title }) =>
-        title.toLowerCase().includes(query.trim().toLowerCase())
-      )
-  const 일치_카테고리 = categories.find(({ title }) => title === query)
+  const filteredCategories = useMemo(
+    () =>
+      !query
+        ? categories
+        : categories.filter(({ title }) =>
+            title.toLowerCase().includes(query.trim().toLowerCase()),
+          ),
+    [categories, query],
+  )
 
-  const openCombobox: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault()
-    open()
-    if (input.current?.focus) {
-      setTimeout(() => input.current?.focus())
-    }
-  }
+  const 일치_카테고리 = useMemo(
+    () => categories.find(({ title }) => title === query),
+    [categories, query],
+  )
 
-  const selectCategory = (c: Category) => {
-    onChange(c)
-    close()
-  }
+  const openCombobox: MouseEventHandler<HTMLButtonElement> = useCallback(
+    (e) => {
+      e.preventDefault()
+      open()
+      if (input.current?.focus) {
+        setTimeout(() => input.current?.focus())
+      }
+    },
+    [open],
+  )
 
-  const errorMessage = nestedValue(`${name}.title.message`, errors)
+  const selectCategory = useCallback(
+    (c: Category) => {
+      onChange(c)
+      close()
+    },
+    [onChange, close],
+  )
 
   return (
     <div>
       <div className="relative">
         <BasicSelectButton
+        ref={buttonRef}
           type="button"
           role="combobox"
           onClick={openCombobox}
@@ -82,15 +92,15 @@ const CategorySelect = ({ categories, name }: Props) => {
           ref={combobox}
           id="category-combobox"
           data-visible={on}
-          className="absolute w-60 top-0 left-0 bg-white border border-gray-200 rounded shadow-md overflow-auto z-20 hidden data-[visible=true]:block"
+          className="absolute left-0 top-0 z-20 hidden w-60 overflow-auto rounded border border-gray-200 bg-white shadow-md data-[visible=true]:block"
         >
-          <Combobox value={value} onChange={selectCategory}>
-            <div className="flex py-2 px-4">
+          <Combobox value={value ?? ''} onChange={selectCategory}>
+            <div className="flex px-4 py-2">
               <Combobox.Input
                 ref={input}
                 autoFocus
                 placeholder="카테고리 이름 입력"
-                className="flex-1 text-sm focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                className="flex-1 text-sm placeholder:text-sm placeholder:text-gray-400 focus:outline-none"
                 displayValue={(c: Category) => c.title}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -104,7 +114,7 @@ const CategorySelect = ({ categories, name }: Props) => {
             >
               {filteredCategories.map((category) => (
                 <Combobox.Option
-                  key={category.id}
+                  key={category.title}
                   value={category}
                   className={({ active }) =>
                     `relative cursor-pointer select-none py-2 pl-10 pr-4 text-gray-900 ${
@@ -113,7 +123,7 @@ const CategorySelect = ({ categories, name }: Props) => {
                   }
                 >
                   <span className="block">{category.title}</span>
-                  {value.title === category.title ? (
+                  {value?.title === category.title ? (
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-900">
                       <CheckIcon className="h-4 w-4 stroke-2" aria-hidden />
                     </span>
@@ -125,7 +135,7 @@ const CategorySelect = ({ categories, name }: Props) => {
                 <Combobox.Option
                   value={{ title: query }}
                   className={({ active }) =>
-                    `relative cursor-pointer select-none py-2 pl-10 pr-4 text-gray-900 border-t-[1px] border-t-gray-200 ${
+                    `relative cursor-pointer select-none border-t-[1px] border-t-gray-200 py-2 pl-10 pr-4 text-gray-900 ${
                       active ? 'bg-neutral-100' : 'bg-white'
                     }`
                   }
@@ -141,9 +151,11 @@ const CategorySelect = ({ categories, name }: Props) => {
           </Combobox>
         </div>
       </div>
-      {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
+      <FieldError message={error} />
     </div>
   )
-}
+})
 
-export default CategorySelect
+CategorySelect.displayName = 'CategorySelect'
+
+export default memo(CategorySelect)

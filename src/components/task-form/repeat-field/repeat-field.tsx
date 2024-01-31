@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Listbox } from '@headlessui/react'
 import { Controller, useController, useFormContext } from 'react-hook-form'
-import { RepeatType } from '@prisma/client'
 
 import useToday from '@/hooks/useToday'
 
@@ -14,7 +13,7 @@ import {
   TaskFormField,
   RepeatTypeValues,
   repeatTypeValues,
-} from '../taskform.types'
+} from '../task-form.types'
 import DateSelect from '@/components/date-select'
 
 type Options = {
@@ -48,20 +47,20 @@ export default function RepeatField() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         <Listbox value={selectedType} onChange={onChange}>
           {({ open }) => (
             <div className="relative">
               <Listbox.Button as={BasicSelectButton} active={open}>
                 {options[selectedType].label}
               </Listbox.Button>
-              <Listbox.Options className="absolute z-10 bg-white rounded-md shadow-lg focus:outline-none py-2 border border-gray-200 text-sm">
+              <Listbox.Options className="absolute z-10 rounded-md border border-gray-200 bg-white py-2 text-sm shadow-lg focus:outline-none">
                 {repeatTypeValues.options.map((type) => (
                   <Listbox.Option
                     key={type}
                     value={type}
                     className={({ active }) =>
-                      `cursor-pointer select-none py-2 px-4 text-gray-900 ${
+                      `cursor-pointer select-none px-4 py-2 text-gray-900 ${
                         active && 'bg-neutral-200/70'
                       }`
                     }

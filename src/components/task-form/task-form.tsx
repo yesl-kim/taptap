@@ -1,14 +1,15 @@
 'use client'
 
-import { FormProvider, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ListBulletIcon, ClockIcon } from '@heroicons/react/24/outline'
-import { RepeatType } from '@prisma/client'
 import toast from 'react-hot-toast'
+import _ from 'lodash'
 
 import { responseSchema } from '@/types/api'
 import useToday from '@/hooks/useToday'
+import { defaultColorOptions } from '@/constants/task.constants'
 
 import ColorSelect from '../color-select/color-select'
 import RepeatField from './repeat-field/repeat-field'
@@ -18,8 +19,8 @@ import {
   TransformedTaskFrom,
   repeatTypeValues,
   taskFormSchema,
-} from './taskform.types'
-import TitleInput from '../text-input'
+} from './task-form.types'
+import TextInput from '../text-input'
 
 const taskResponseSchema = responseSchema(z.NEVER)
 type TaskResponse = z.infer<typeof taskResponseSchema>
@@ -30,9 +31,11 @@ type TaskFormProps = {
   task?: TaskFormField
 }
 
-export default function TaskForm({ categories, action, task }: TaskFormProps) {
+const TaskForm = ({ categories, action, task }: TaskFormProps) => {
   const { today } = useToday()
   const defaultValue = {
+    color: defaultColorOptions[0],
+    category: categories[0]?.title,
     repeat: {
       type: repeatTypeValues.Values.None,
       data: {
@@ -52,24 +55,32 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
   })
 
   const {
+    register,
+    control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = context
 
   const submit = async (task: TransformedTaskFrom) => {
     console.log('submit', task, errors)
-    const promise = action(task).then((res) => {
-      if (!res.success) {
-        throw res.error
-      }
-    })
+    // const promise = action(task).then((res) => {
+    //   if (!res.success) {
+    //     throw res.error
+    //   }
+    // })
 
-    toast.promise(promise, {
-      loading: '저장 중...',
-      success: '일정이 저장되었습니다.',
-      error: (message) => message,
-    })
+    // toast.promise(promise, {
+    //   loading: '저장 중...',
+    //   success: '일정이 저장되었습니다.',
+    //   error: (message) => message,
+    // })
   }
+
+  console.log(errors)
+  const title = watch('title')
+  console.log('value', title, typeof title)
 
   return (
     <FormProvider {...context}>
@@ -78,17 +89,47 @@ export default function TaskForm({ categories, action, task }: TaskFormProps) {
         className="max-w-xl pl-24 pr-2 pt-2"
       >
         <header className="mb-6">
-          <TitleInput name="title" />
+          <TextInput
+            {...register('title')}
+            onChange={(v) => setValue('title', v)}
+            error={_.get(errors, 'title.message')}
+            placeholder="제목"
+          />
         </header>
+
         <Section Icon={ListBulletIcon}>
           <div className="flex items-center gap-2">
-            <ColorSelect name="color" />
-            <CategorySelect name="category" categories={categories} />
+            <Controller
+              control={control}
+              name="category"
+              render={({ field: { onChange, value, ...field } }) => (
+                <CategorySelect
+                  {...field}
+                  value={{ title: value }}
+                  onChange={(c) => onChange(c.title)}
+                  categories={categories}
+                  error={_.get(errors, 'category.message')}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="color"
+              render={({ field }) => (
+                <ColorSelect
+                  {...field}
+                  error={_.get(errors, 'color.message')}
+                />
+              )}
+            />
           </div>
         </Section>
+
         <Section Icon={ClockIcon}>
           <RepeatField />
         </Section>
+
         <footer className="mt-8 flex w-full justify-end py-2">
           <button
             type="submit"
@@ -115,3 +156,5 @@ const Section = ({ Icon, children }: Props) => (
     {children}
   </section>
 )
+
+export default TaskForm

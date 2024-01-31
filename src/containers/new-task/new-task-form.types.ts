@@ -17,12 +17,17 @@ const periodSchema = z
     })
   })
 
-const categorySchema = z.object({
-  title: z.string({ required_error: '카테고리를 선택해주세요.' }),
-})
+const categorySchema = z.object(
+  {
+    title: z.string(),
+  },
+  { required_error: '카테고리를 선택해주세요' },
+)
 
 export const newTaskFormFieldSchema = z.object({
-  title: z.string().min(1, { message: '제목을 입력해주세요.' }),
+  title: z
+    .string({ required_error: '제목을 입력해주세요.' })
+    .min(1, { message: '제목을 입력해주세요.' }),
   category: categorySchema,
   color: colorSchema,
   startDate: z
@@ -33,10 +38,22 @@ export const newTaskFormFieldSchema = z.object({
         message: '과거의 날짜는 추가할 수 없습니다.',
       },
     ),
-  time: periodSchema,
+  time: periodSchema.nullable().optional(),
 })
+
+export const newTaskFormInputSchema = newTaskFormFieldSchema.partial({
+  category: true,
+})
+
+export const newTaskFormPayloadSchema = newTaskFormFieldSchema
+  .partial()
+  .extend({
+    time: z.union([z.object({ start: z.date() }), z.object({ end: z.date() })]),
+  })
 
 export type PeriodType = z.infer<typeof periodSchema>
 
 export type NewTaskFormField = z.input<typeof newTaskFormFieldSchema>
+export type NewTaskFormInput = Partial<NewTaskFormField>
+export type NewTaskFormPayload = Partial<NewTaskFormField>
 export type NewTaskFormValue = z.output<typeof newTaskFormFieldSchema>

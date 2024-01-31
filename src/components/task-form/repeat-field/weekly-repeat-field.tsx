@@ -11,7 +11,7 @@ import PeriodFields from '@/components/period-fields'
 import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
 import EndDateField from './end-date-field'
-import { PeriodType } from '../taskform.types'
+import { PeriodType } from '../task-form.types'
 import IconButton from '@/components/icon-button'
 
 export type RepeatFormData = {
@@ -115,12 +115,12 @@ const DayOfWeekRepeatField = memo(
     }, [name, selectedDate, register, unregister])
 
     return (
-      <div className="flex gap-2 group">
-        <span className="text-gray-900 basis-10 max-h-[40px] flex items-center">
+      <div className="group flex gap-2">
+        <span className="flex max-h-[40px] basis-10 items-center text-gray-900">
           {format(selectedDate, 'E', { locale: ko })}
         </span>
         <PeriodFields name={`${name}.times`} />
-        <div className="max-h-[40px] flex items-center group-only:hidden">
+        <div className="flex max-h-[40px] items-center group-only:hidden">
           <IconButton
             type="button"
             onClick={onCopy}
@@ -130,7 +130,7 @@ const DayOfWeekRepeatField = memo(
         </div>
       </div>
     )
-  }
+  },
 )
 
 DayOfWeekRepeatField.displayName = 'DayOfWeekRepeatField'

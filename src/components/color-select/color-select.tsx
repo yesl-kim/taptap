@@ -2,99 +2,90 @@
 
 import {
   KeyboardEventHandler,
+  forwardRef,
   memo,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react'
-import { useController, useFormContext } from 'react-hook-form'
 
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
+import { defaultColorOptions } from '@/constants/task.constants'
 
 import BasicSelectButton from '../basic-select-button'
-import {
-  FOCUSED_ATTR,
-  ITEM_DATA_ATTR,
-  KEY,
-  defaultOptions,
-} from './color-select.constants'
-import ErrorWrapper from '../error-wrapper'
+import { FOCUSED_ATTR, ITEM_DATA_ATTR, KEY } from './color-select.constants'
+import FieldError from '../field-error'
 
 // TODO: apply headless ui - listbox
-interface Props {
-  name: string
+type Props = {
   options?: string[]
+  onChange: (value: string) => void
+  value?: string
+  error?: string
 }
 
-const ColorSelect = ({ name, options = defaultOptions }: Props) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext()
+const ColorSelect = forwardRef<HTMLButtonElement, Props>(
+  ({ options = defaultColorOptions, value, onChange, error }, buttonRef) => {
+    const { on, toggle, turnOff: closeMenu, turnOn: openMenu } = useBoolean()
 
-  const {
-    field: { value, onChange },
-  } = useController({ control, name, defaultValue: options[0] })
+    const listRef = useRef<HTMLUListElement>(null)
+    const [focusedIndex, setFocusedIndex] = useState(0)
 
-  const { on, toggle, turnOff: closeMenu, turnOn: openMenu } = useBoolean()
+    const outsideRef = useRef<HTMLDivElement>(null)
+    useOutsideClick({ outsideRef, action: closeMenu })
 
-  const listRef = useRef<HTMLUListElement>(null)
-  const [focusedIndex, setFocusedIndex] = useState(0)
+    const select = useCallback(
+      (newValue: string) => {
+        onChange(newValue)
+        setFocusedIndex(options.findIndex((option) => option === newValue))
+        closeMenu()
+      },
+      [onChange, closeMenu, options],
+    )
 
-  const outsideRef = useRef<HTMLDivElement>(null)
-  useOutsideClick({ outsideRef, action: closeMenu })
+    const selectByKeyboard: KeyboardEventHandler<HTMLDivElement> = useCallback(
+      (e) => {
+        if (e.key === KEY.enter) {
+          e.preventDefault()
+          if (!on) {
+            openMenu()
+            return
+          }
 
-  const select = useCallback(
-    (newValue: string) => {
-      onChange(newValue)
-      setFocusedIndex(options.findIndex((option) => option === newValue))
-      closeMenu()
-    },
-    [onChange, closeMenu, options],
-  )
-
-  const selectByKeyboard: KeyboardEventHandler<HTMLDivElement> = useCallback(
-    (e) => {
-      if (e.key === KEY.enter) {
-        e.preventDefault()
-        if (!on) {
-          openMenu()
+          const newValue =
+            listRef.current?.children[focusedIndex].getAttribute(
+              ITEM_DATA_ATTR,
+            ) ?? ''
+          select(newValue)
           return
         }
 
-        const newValue =
-          listRef.current?.children[focusedIndex].getAttribute(
-            ITEM_DATA_ATTR,
-          ) ?? ''
-        select(newValue)
-        return
-      }
+        if (e.key === KEY.down || e.key === KEY.right) {
+          e.preventDefault()
+          setFocusedIndex((prev) => (prev + 1) % options.length)
+          return
+        }
 
-      if (e.key === KEY.down || e.key === KEY.right) {
-        e.preventDefault()
-        setFocusedIndex((prev) => (prev + 1) % options.length)
-        return
-      }
+        if (e.key === KEY.up || e.key === KEY.left) {
+          e.preventDefault()
+          const lastIndex = options.length - 1
+          setFocusedIndex((prev) => (prev === 0 ? lastIndex : prev - 1))
+          return
+        }
 
-      if (e.key === KEY.up || e.key === KEY.left) {
-        e.preventDefault()
-        const lastIndex = options.length - 1
-        setFocusedIndex((prev) => (prev === 0 ? lastIndex : prev - 1))
-        return
-      }
+        if (e.key === KEY.tab) {
+          closeMenu()
+        }
+      },
+      [focusedIndex, select, openMenu, on, closeMenu, options],
+    )
 
-      if (e.key === KEY.tab) {
-        closeMenu()
-      }
-    },
-    [focusedIndex, select, openMenu, on, closeMenu, options],
-  )
-
-  return (
-    <div className="relative" ref={outsideRef} onKeyDown={selectByKeyboard}>
-      <ErrorWrapper error={errors} path={`${name}.message`}>
+    return (
+      <div className="relative" ref={outsideRef} onKeyDown={selectByKeyboard}>
         <BasicSelectButton
+          ref={buttonRef}
           type="button"
           active={on}
           aria-haspopup
@@ -133,11 +124,13 @@ const ColorSelect = ({ name, options = defaultOptions }: Props) => {
             ))}
           </ul>
         )}
-      </ErrorWrapper>
-    </div>
-  )
-}
 
-ColorSelect.defaultOptions = defaultOptions
+        <FieldError message={error} />
+      </div>
+    )
+  },
+)
+
+ColorSelect.displayName = 'ColorSelect'
 
 export default memo(ColorSelect)

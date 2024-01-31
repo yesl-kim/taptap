@@ -10,8 +10,8 @@ import IconButton from '@/components/icon-button'
 import PeriodFields from '@/components/period-fields'
 import Calendar from '@/components/calendar/calendar'
 import DateSelect from '@/components/date-select'
-import { TaskFormField } from '../taskform.types'
-import ErrorWrapper from '@/components/error-wrapper'
+import { TaskFormField } from '../task-form.types'
+import FieldError from '@/components/field-error'
 
 interface Props {
   name: string
@@ -41,15 +41,10 @@ const NonRepeatField = () => {
   }, [values, trigger])
 
   return (
-    <ErrorWrapper error={errors} path={`${name}.message`}>
+    <div>
       <div>
         {repeatFields.map(({ id, times }, i) => (
-          <ErrorWrapper
-            key={id}
-            error={errors}
-            path={`${name}.${i}.startDate.message`}
-            className="mb-2 last:mb-0"
-          >
+          <div className="mb-2 last:mb-0" key={id}>
             <div className="flex gap-2">
               <Controller
                 control={control}
@@ -69,9 +64,19 @@ const NonRepeatField = () => {
                 </div>
               )}
             </div>
-          </ErrorWrapper>
+
+            <div className="pl-3 pt-1">
+              <FieldError
+                message={_.get(errors, `${name}.${i}.startDate.message`)}
+              />
+            </div>
+          </div>
         ))}
+        <div className="my-1 pl-2">
+          <FieldError message={_.get(errors, `${name}.message`)} />
+        </div>
       </div>
+
       <Menu as="div" className="relative">
         <Menu.Button
           type="button"
@@ -93,7 +98,7 @@ const NonRepeatField = () => {
           </Menu.Item>
         </Menu.Items>
       </Menu>
-    </ErrorWrapper>
+    </div>
   )
 }
 

@@ -7,7 +7,7 @@ import useToday from '@/hooks/useToday'
 
 import BasicSelectButton from '@/components/basic-select-button'
 import DateSelect from '@/components/date-select'
-import { TaskFormField } from '../taskform.types'
+import { TaskFormField } from '../task-form.types'
 
 type Props = {
   name: string
@@ -19,7 +19,7 @@ const EndDateField = () => {
 
   const defaultValue = useMemo(
     () => addMonths(getValues('repeat.startDate') ?? today, 3),
-    [today, getValues]
+    [today, getValues],
   )
 
   const options = useMemo(
@@ -27,7 +27,7 @@ const EndDateField = () => {
       { label: '반복 종료 안함', value: undefined },
       { label: '반복 종료 날짜', value: defaultValue },
     ],
-    [defaultValue]
+    [defaultValue],
   )
 
   const {
@@ -42,13 +42,13 @@ const EndDateField = () => {
             <Listbox.Button as={BasicSelectButton} active={open}>
               {value ? '반복 종료 날짜' : '반복 종료 안함'}
             </Listbox.Button>
-            <Listbox.Options className="absolute z-10 bg-white rounded-md shadow-lg focus:outline-none py-2 border border-gray-200 text-sm">
+            <Listbox.Options className="absolute z-10 rounded-md border border-gray-200 bg-white py-2 text-sm shadow-lg focus:outline-none">
               {options.map((option) => (
                 <Listbox.Option
                   key={option.label}
                   value={option.value}
                   className={({ active }) =>
-                    `cursor-pointer select-none py-2 px-4 text-gray-900 ${
+                    `cursor-pointer select-none px-4 py-2 text-gray-900 ${
                       active && 'bg-neutral-200/70'
                     }`
                   }

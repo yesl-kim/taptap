@@ -1,99 +1,87 @@
-import { useMemo, useState } from 'react'
+import { forwardRef, useCallback, useMemo, useState } from 'react'
 import { useFormContext, Controller } from 'react-hook-form'
 import { addHours, addMinutes, isBefore, isSameMinute } from 'date-fns'
+import _ from 'lodash'
 
 import { round30Minutes } from '@/utils/datetime'
 import { nestedValue } from '@/utils/parser'
 
 import TimeSelect from './time-select'
+import FieldError from './field-error'
 
-export type PeriodData = {
-  start: Date
-  end: Date
+type Key = 'start' | 'end'
+
+export type Period = {
+  [key in Key]: Date
 }
+
+type Errors = {
+  [key in Key]?: string
+}
+
+type Payload = Pick<Period, 'start'> | Pick<Period, 'end'>
 
 interface Props {
-  name: string
-  range: PeriodData
+  range: Period
+  value?: Period
+  onChange: (value: Payload) => void
+  errors?: Errors
 }
 
-const PeriodField = ({ name, range }: Props) => {
-  const {
-    control,
-    formState: { errors },
-    watch,
-    trigger,
-  } = useFormContext()
+const PeriodField = ({ range, value, onChange, errors }: Props) => {
+  // const defaultValue = useMemo(() => getDefaultValue(range), [range])
+  // const value = _value ?? defaultValue
 
-  const defaultValue = useMemo(() => getDefaultValue(range), [range])
-  const value = watch(name, defaultValue)
-
-  const [prevRange, setPrevRange] = useState(range)
-  if (!isSameMinute(prevRange.start, range.start)) {
-    trigger(`${name}.start`).finally(() => setPrevRange(range))
-  }
+  // const [prevRange, setPrevRange] = useState(range)
+  // if (!isSameMinute(prevRange.start, range.start)) {
+  //   trigger(`${name}.start`).finally(() => setPrevRange(range))
+  // }
 
   const endRange = useMemo(
-    () => ({ start: addMinutes(value.start, 1), end: range.end }),
-    [value, range]
+    () =>
+      !value ? range : { start: addMinutes(value.start, 1), end: range.end },
+    [value, range],
+  )
+
+  const _onChange = useCallback(
+    (name: Key) => (v: Date) => onChange({ ...value, [name]: v } as Period),
+    [onChange, value],
   )
 
   const errorMessage =
-    nestedValue(`${name}.root.message`, errors) ||
-    nestedValue(`${name}.start.message`, errors) ||
-    nestedValue(`${name}.end.message`, errors)
+    errors && Object.values(errors).find((e) => !_.isEmpty(e))
 
   return (
     <div>
-      <div className="flex gap-2 items-center">
-        <Controller
-          name={`${name}.start`}
-          control={control}
-          defaultValue={defaultValue.start}
-          render={({ field: { ref, onChange, ...props } }) => (
-            <TimeSelect
-              {...props}
-              range={range}
-              onChange={(e) => {
-                onChange(e)
-                trigger(`${name}.end`, { shouldFocus: true })
-              }}
-              valid={!nestedValue(`${name}.start`, errors)}
-            />
-          )}
+      <div className="flex items-center gap-2">
+        <TimeSelect
+          range={range}
+          value={value?.start}
+          onChange={_onChange('start')}
+          valid={!_.get(errors, 'start')}
+          placeholder="시작 시간"
         />
         <span className="p-2" aria-hidden>
           -
         </span>
-        <Controller
-          name={`${name}.end`}
-          control={control}
-          rules={{
-            required: true,
-            validate: (v) =>
-              isBefore(value.start, v) ||
-              '시작 시간은 종료 시간 이전이어야 합니다.',
-          }}
-          defaultValue={defaultValue.end}
-          render={({ field: { ref, ...props } }) => (
-            <TimeSelect
-              {...props}
-              range={endRange}
-              valid={!nestedValue(`${name}.end`, errors)}
-            />
-          )}
+        <TimeSelect
+          range={endRange}
+          value={value?.end}
+          onChange={_onChange('end')}
+          valid={!_.get(errors, 'end')}
+          placeholder="종료 시간"
         />
       </div>
-      {errorMessage && (
-        <p className="ml-3 pt-1 text-xs text-red-600">{errorMessage}</p>
-      )}
+      <div className="mt-1 pl-1">
+        <FieldError message={errorMessage} />
+      </div>
     </div>
   )
 }
 
 export default PeriodField
 
-const getDefaultValue = (range: PeriodData): PeriodData => {
+const getDefaultValue = (range: Period): Period => {
   const start = addHours(round30Minutes(range.start), 1)
   const end = addHours(start, 1)
   return { start, end }
