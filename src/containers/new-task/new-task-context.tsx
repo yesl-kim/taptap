@@ -40,12 +40,9 @@ const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
       const startTime = datetime ?? round30Minutes(new Date())
       const endTime = addHours(startTime, 1)
 
-      const initialTask: NewTaskFormField = {
+      const initialTask: NewTaskFormInput = {
         title: '',
         color: defaultColorOptions[0],
-        category: {
-          title: '',
-        },
         startDate,
         time: { start: startTime, end: endTime },
       }
