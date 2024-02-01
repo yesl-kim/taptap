@@ -90,7 +90,7 @@ export const categoryUpdateInputSchema = categorySchema.pick({
 // task =========================================
 // TODO: add records type
 export const taskSchema = model.extend({
-  title: z.string({ required_error: '필수값입니다.' }).min(1),
+  title: z.string({ required_error: '필수값입니다.' }),
   color: z.string(),
   repeats: z.array(repeatSchema),
   categoryId: z.string().cuid(),

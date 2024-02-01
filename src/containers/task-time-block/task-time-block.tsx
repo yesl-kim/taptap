@@ -10,10 +10,10 @@ import {
 import { ko } from 'date-fns/locale'
 
 import { Period } from '@/types/schema'
+import { intervalToString } from '@/utils/datetime'
 
 import PopoverPanelLayout from '@/components/popover-panel-layout'
 import ListItem from '@/components/list-item'
-import { intervalToString } from './task-time-block.utils'
 
 type TaskTimeBlockProps = {
   task: {

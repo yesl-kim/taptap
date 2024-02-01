@@ -1,11 +1,21 @@
 'use client'
 
 import { Repeat, Task } from '@prisma/client'
-import { Interval, format, parse } from 'date-fns'
+import { Interval, format, isSameDay } from 'date-fns'
+import { z } from 'zod'
 
 import { TaskWithRepeat } from '@/actions/task/get-tasks'
 import TaskTimeBlock from '@/containers/task-time-block/task-time-block'
-import { Period, PeriodString } from '@/types/schema'
+import {
+  Period,
+  PeriodString,
+  categorySchema,
+  repeatSchema,
+  taskSchema,
+} from '@/types/schema'
+import { useNewTaskContext } from '@/containers/new-task/new-task-context'
+import NewTaskTimeBlock from '@/containers/new-task/new-task-time-block/new-task-time-block'
+import { periodStringToInterval, timestringForDBToDate } from '@/utils/datetime'
 
 import Timetable from './time-table/timetable'
 
@@ -22,27 +32,46 @@ type Props = {
 }
 
 const TaskTimetable = ({ tasks, date }: Props) => {
-  const data = tasks.flatMap(({ repeat, ...t }) =>
-    repeat.times.map((period) => {
-      const newPeriod = Object.entries(period).reduce((parsed, cur) => {
-        const [key, timestring] = cur
-        const time = parse(timestring, 'HH:mm', date)
-        return { ...parsed, [key]: time }
-      }, {} as Period)
-      return { ...t, time: newPeriod }
-    })
-  )
+  const { task: newTask, create } = useNewTaskContext()
+  const data = tasks.flatMap((task) => parse(task, date))
+
+  const hasNewTask = newTask && isSameDay(newTask.startDate, date)
 
   return (
     <Timetable
       date={date}
       data={data}
-      newBlock={(time) => (
-        <div className="bg-blue-200">{format(time, 'hh:mm')}</div>
-      )}
+      onCreate={(time) => {
+        console.log(time)
+        create(time)
+      }}
       renderItem={(task) => <TaskTimeBlock task={task} date={date} />}
+      newBlock={hasNewTask && <NewTaskTimeBlock />}
     />
   )
 }
 
 export default TaskTimetable
+
+const parse = (value: any, date: Date) =>
+  taskSchema
+    .pick({
+      title: true,
+      color: true,
+    })
+    .extend({
+      category: categorySchema.pick({ title: true }),
+      repeat: repeatSchema
+        .pick({
+          startDate: true,
+          times: true,
+        })
+        .required({ times: true }),
+    })
+    .transform(({ repeat, ...task }) =>
+      repeat.times.map((period) => {
+        const interval = periodStringToInterval(period, date)
+        return { ...task, time: interval, editing: false }
+      }),
+    )
+    .parse(value)

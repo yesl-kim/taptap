@@ -22,10 +22,14 @@ import ColorSelect from '@/components/color-select/color-select'
 import PeriodField from '@/components/period-field'
 import ListItem from '@/components/list-item'
 import DateSelect from '@/components/date-select'
-import { NewTaskFormField, newTaskFormFieldSchema } from './new-task-form.types'
-import { useNewTaskContext } from './new-task-context'
 import FieldError from '@/components/field-error'
 import Checkbox from '@/components/checkbox'
+import {
+  NewTaskFormField,
+  newTaskFormFieldSchema,
+  newTaskFormInputSchema,
+} from '../new-task-form.types'
+import { useNewTaskContext } from '../new-task-context'
 
 type Error = {
   _errors: string[]
@@ -40,12 +44,11 @@ const NewTaskForm = () => {
   const [errors, setErrors] = useState<Partial<Errors>>({})
 
   const validate = useCallback(
-    (input: any, schema = newTaskFormFieldSchema.partial() as ZodType) => {
+    (input: any, schema = newTaskFormInputSchema as ZodType) => {
       const verification = schema.safeParse(input)
       const isValid = verification.success
 
       if (!isValid) {
-        console.log('real error: ', verification.error)
         setErrors((prev) => ({ ...prev, ...verification.error.format() }))
       } else {
         setErrors((prev) => {
@@ -111,8 +114,6 @@ const NewTaskForm = () => {
     }
   }
 
-  useEffect(() => console.log('e', value), [value])
-  // useEffect(() => console.log('e', errors), [errors])
   const { getStartOfDay, getEndOfDay } = useToday()
 
   return (

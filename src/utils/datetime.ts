@@ -1,11 +1,19 @@
-import { RoundingMethod, format, parse, roundToNearestMinutes } from 'date-fns'
+import { ko } from 'date-fns/locale'
+import {
+  Interval,
+  RoundingMethod,
+  differenceInMinutes,
+  format,
+  parse,
+  roundToNearestMinutes,
+} from 'date-fns'
 
-import { timestringSchema } from '@/types/schema'
+import { timestringSchema, Period, PeriodString } from '@/types/schema'
 
 const STEP = 30
 export const round30Minutes = (
   time: Date,
-  roundingMethod = 'ceil' as RoundingMethod
+  roundingMethod = 'ceil' as RoundingMethod,
 ) =>
   roundToNearestMinutes(time, {
     nearestTo: STEP,
@@ -22,3 +30,31 @@ NOTE
 export const dateToTimestringForDB = (date: Date) => format(date, 'HH:mm')
 export const timestringForDBToDate = (timestring: string, date: Date) =>
   parse(timestringSchema.parse(timestring), 'HH:mm', date)
+
+export const periodStringToInterval = (period: PeriodString, date: Date) =>
+  Object.entries(period).reduce((parsed, cur) => {
+    const [key, timestring] = cur
+    const time = timestringForDBToDate(timestring, date)
+    return { ...parsed, [key]: time }
+  }, {} as Period)
+
+export const intervalToString = ({ start, end }: Period) => {
+  const [startHalfDay, endHalfDay] = [start, end].map((time) =>
+    format(time, 'aaa', { locale: ko }),
+  )
+  const [startString, endString] = [start, end].map((time) =>
+    format(time, 'h:mm'),
+  )
+
+  if (startHalfDay === endHalfDay) {
+    return `${startHalfDay} ${startString} ~ ${endString}`
+  } else {
+    return `${startHalfDay} ${startString} ~ ${endHalfDay} ${endString}`
+  }
+}
+
+export const intervalToPercentageOfDay = ({ start, end }: Interval) => {
+  const $1DAY_MINUTE = 24 * 60
+  const duration = differenceInMinutes(end, start)
+  return Math.floor((duration / $1DAY_MINUTE) * 100)
+}

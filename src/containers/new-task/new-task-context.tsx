@@ -13,54 +13,65 @@ import useToday from '@/hooks/useToday'
 import { defaultColorOptions } from '@/constants/task.constants'
 import { round30Minutes } from '@/utils/datetime'
 
-import { NewTaskFormField, NewTaskFormInput } from './new-task-form.types'
+import { NewTaskFormField, NewTaskFormPayload } from './new-task-form.types'
 
 type NewTaskContextType = {
-  task: Partial<NewTaskFormField> | null
+  task: NewTaskFormField | null
   create: (datetime?: Date) => void
-  update: (task: Partial<NewTaskFormField>) => void
+  update: (task: NewTaskFormPayload) => void
   reset: () => void
 }
 
 const NewTaskContext = createContext<null | NewTaskContextType>(null)
 
 /*
-[ ] type
 [ ] jotai
-[ ] reducer
 */
 
 const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
   const { today } = useToday()
-  const [task, setTask] = useState<null | NewTaskFormInput>(null)
+  const [task, setTask] = useState<null | NewTaskFormField>(null)
+
+  const defaultTask: NewTaskFormField = useMemo(() => {
+    const startTime = round30Minutes(new Date())
+    const endTime = addHours(startTime, 1)
+    return {
+      title: '',
+      category: {
+        title: '',
+      },
+      color: defaultColorOptions[0],
+      startDate: today,
+      time: { start: startTime, end: endTime },
+    }
+  }, [today])
 
   const create = useCallback(
     (datetime?: Date) => {
-      const startDate = datetime ?? today
-      const startTime = datetime ?? round30Minutes(new Date())
-      const endTime = addHours(startTime, 1)
-
-      const initialTask: NewTaskFormInput = {
-        title: '',
-        color: defaultColorOptions[0],
-        startDate,
-        time: { start: startTime, end: endTime },
+      if (!datetime) {
+        setTask(defaultTask)
+        return
       }
 
-      setTask(initialTask)
+      const time = { start: datetime, end: addHours(datetime, 1) }
+      setTask({
+        ...defaultTask,
+        startDate: datetime,
+        time,
+      })
     },
-    [today],
+    [defaultTask],
   )
 
-  const update = useCallback((payload: NewTaskFormInput) => {
-    setTask((prev) => {
-      if (!prev) {
-        return payload
-      }
-
-      return { ...prev, ...payload }
-    })
-  }, [])
+  const update = useCallback(
+    (payload: NewTaskFormPayload) => {
+      setTask((prev) => {
+        if (!prev) return { ...defaultTask, ...payload }
+        return { ...prev, ...payload }
+      })
+    },
+    [defaultTask],
+  )
 
   const reset = useCallback(() => setTask(null), [])
 

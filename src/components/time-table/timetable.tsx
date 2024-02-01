@@ -16,7 +16,8 @@ type TimeTableProps<T> = {
   date: Date
   data: T[]
   renderItem: (item: T) => ReactNode
-  newBlock?: (selectedTime: Date) => ReactNode
+  newBlock?: ReactNode
+  onCreate: (selectedDateTime: Date) => void
 }
 
 /*
@@ -28,6 +29,7 @@ const Timetable = <T extends { time: Period }>({
   date,
   newBlock,
   renderItem,
+  onCreate,
 }: TimeTableProps<T>) => {
   const { getStartOfDay } = useToday()
   const [offsetY, setOffsetY] = useState<null | number>(null)
@@ -37,18 +39,19 @@ const Timetable = <T extends { time: Period }>({
   const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
     const { offsetY } = e.nativeEvent
     const selectedTime = getSelectedTime(offsetY)
-    const state = {
-      repeats: [
-        {
-          startDate: date,
-          times: [{ start: selectedTime, end: addHours(selectedTime, 1) }],
-        },
-      ],
-    }
-    const params = new URLSearchParams({
-      state: encodeURIComponent(JSON.stringify(state)),
-    })
-    router.push(`/taskedit?${params.toString()}`)
+    onCreate(selectedTime)
+    // const state = {
+    //   repeats: [
+    //     {
+    //       startDate: date,
+    //       times: [{ start: selectedTime, end: addHours(selectedTime, 1) }],
+    //     },
+    //   ],
+    // }
+    // const params = new URLSearchParams({
+    //   state: encodeURIComponent(JSON.stringify(state)),
+    // })
+    // router.push(`/taskedit?${params.toString()}`)
   }
 
   // const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -67,13 +70,12 @@ const Timetable = <T extends { time: Period }>({
   return (
     <div className="relative bg-white" style={{ height: `${TOTAL_HEIGHT}px` }}>
       <div className="absolute inset-0" onClick={selectTime} />
-      {/* <div className="absolute inset-0" onClick={selectTime} /> */}
 
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="pointer-events-none absolute inset-0">
         {data.map((item) => (
           <div
             key={`${item.time.start.toString()} ~ ${item.time.end.toString()}`}
-            className={`absolute inset-x-0 flex pointer-events-auto`}
+            className={`pointer-events-auto absolute inset-x-0 flex`}
             style={{
               top: timeToOffset(item.time.start),
               height: intervalToHeight(item.time),
@@ -83,6 +85,7 @@ const Timetable = <T extends { time: Period }>({
             {renderItem(item)}
           </div>
         ))}
+        {newBlock}
         {/* <div
           data-visible={!!offsetY}
           className="absolute inset-x-0 top-0 hidden data-[visible=true]:block pointer-events-none"

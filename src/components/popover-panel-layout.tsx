@@ -14,7 +14,7 @@ const PopoverPanelLayout = ({
   children,
   close,
 }: Props) => (
-  <div className="px-1.5 pt-2 border-gray-200 border-[1px] bg-white rounded drop-shadow-xl shadow-black">
+  <div className="rounded border-[1px] border-gray-200 bg-white px-1.5 pt-2 shadow-black drop-shadow-xl">
     <header className="flex justify-end gap-2">
       {header.map((props) => (
         <IconButton key={props.label} {...props} />
@@ -23,7 +23,7 @@ const PopoverPanelLayout = ({
     </header>
     <main className="pb-4">{children}</main>
     {footer ? (
-      <footer className="px-2 border-t-[1px] border-gray-200">{footer}</footer>
+      <footer className="border-t-[1px] border-gray-200 px-2">{footer}</footer>
     ) : null}
   </div>
 )

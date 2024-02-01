@@ -41,9 +41,7 @@ export const newTaskFormFieldSchema = z.object({
   time: periodSchema.nullable().optional(),
 })
 
-export const newTaskFormInputSchema = newTaskFormFieldSchema.partial({
-  category: true,
-})
+export const newTaskFormInputSchema = newTaskFormFieldSchema.partial()
 
 export const newTaskFormPayloadSchema = newTaskFormFieldSchema
   .partial()
@@ -53,7 +51,6 @@ export const newTaskFormPayloadSchema = newTaskFormFieldSchema
 
 export type PeriodType = z.infer<typeof periodSchema>
 
+export type NewTaskFormPayload = z.infer<typeof newTaskFormInputSchema>
 export type NewTaskFormField = z.input<typeof newTaskFormFieldSchema>
-export type NewTaskFormInput = Partial<NewTaskFormField>
-export type NewTaskFormPayload = Partial<NewTaskFormField>
-export type NewTaskFormValue = z.output<typeof newTaskFormFieldSchema>
+export type NewTaskFormOutput = z.output<typeof newTaskFormFieldSchema>
