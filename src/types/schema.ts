@@ -31,6 +31,7 @@ export const colorSchema = z
 export const timestringSchema = z
   .string()
   .regex(/^([01][0-9])|(2[0-4]):([0-5][0-9])$/) // HH:mm
+// export const dateSchema = z.date()
 export const dateSchema = z.union([z.date(), z.string().datetime()])
 
 export const periodStringSchema = z.object({
@@ -49,7 +50,7 @@ export type Period = z.infer<typeof periodDateSchema>
 
 export const repeatSchema = model.extend({
   startDate: dateSchema,
-  endDate: z.optional(z.date()),
+  endDate: z.optional(dateSchema),
   times: z.optional(z.array(periodStringSchema)),
   type: z.optional(z.enum(['Daily', 'Weekly', 'Monthly', 'Yearly'])),
   interval: z.optional(z.number().int().positive()),

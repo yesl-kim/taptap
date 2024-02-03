@@ -5,7 +5,7 @@ import useToday from '@/hooks/useToday'
 
 import NewTaskPreview from './new-task-preview'
 import PopoverPanelLayout from '@/components/popover-panel-layout'
-import NewTaskForm from './new-task-form'
+import NewTaskForm from './new-task-simple-form'
 import { useNewTaskContext } from '../new-task-context'
 
 /*

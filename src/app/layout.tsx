@@ -3,8 +3,7 @@ import { Toaster } from 'react-hot-toast'
 
 import type { Metadata } from 'next'
 import './globals.css'
-import AuthContext from '@/containers/auth-context'
-import { TodayContextProvider } from '@/hooks/useToday'
+import GlobalProvider from '@/containers/global-provider'
 
 import Sidebar from '@/components/sidebar/sidebar'
 import Profile from '@/components/profile/profile'
@@ -24,19 +23,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <AuthContext>
-          <TodayContextProvider>
-            <div className="min-h-screen bg-neutral-100">
-              <header className="flex justify-end h-[60px] items-center px-5">
-                <Profile />
-              </header>
-              <div className="flex min-h-[calc(100vh-60px)] gap-1">
-                <Sidebar />
-                <div className="flex-1">{children}</div>
-              </div>
+        <GlobalProvider>
+          <div className="min-h-screen bg-neutral-100">
+            <header className="flex h-[60px] items-center justify-end px-5">
+              <Profile />
+            </header>
+            <div className="flex min-h-[calc(100vh-60px)] gap-1">
+              <Sidebar />
+              <div className="flex-1">{children}</div>
             </div>
-          </TodayContextProvider>
-        </AuthContext>
+          </div>
+        </GlobalProvider>
         <Toaster />
       </body>
     </html>

@@ -10,10 +10,10 @@ import _ from 'lodash'
 import { responseSchema } from '@/types/api'
 import useToday from '@/hooks/useToday'
 import { defaultColorOptions } from '@/constants/task.constants'
+import CategorySelect from '@/containers/category-select/category-select'
 
 import ColorSelect from '../color-select/color-select'
 import RepeatField from './repeat-field/repeat-field'
-import CategorySelect, { Category } from './category-select'
 import {
   TaskFormField,
   TransformedTaskFrom,

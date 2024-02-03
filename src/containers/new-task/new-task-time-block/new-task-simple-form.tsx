@@ -12,12 +12,15 @@ import {
 } from 'react'
 import { ZodType } from 'zod'
 import { addHours } from 'date-fns'
+import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 import useToday from '@/hooks/useToday'
 import { round30Minutes } from '@/utils/datetime'
+import { createTask } from '@/actions/task/create-task'
+import CategorySelect from '@/containers/category-select/category-select'
 
 import TextInput from '@/components/text-input'
-import CategorySelect from '@/components/task-form/category-select'
 import ColorSelect from '@/components/color-select/color-select'
 import PeriodField from '@/components/period-field'
 import ListItem from '@/components/list-item'
@@ -28,6 +31,7 @@ import {
   NewTaskFormField,
   newTaskFormFieldSchema,
   newTaskFormInputSchema,
+  newTaskFormOuputSchema,
 } from '../new-task-form.types'
 import { useNewTaskContext } from '../new-task-context'
 
@@ -39,16 +43,16 @@ type Errors = {
   [key in keyof NewTaskFormField]?: Error
 }
 
-const NewTaskForm = () => {
+const NewTaskSimpleForm = () => {
   const { update, task: value } = useNewTaskContext()
   const [errors, setErrors] = useState<Partial<Errors>>({})
 
+  // TODO
   const validate = useCallback(
     (input: any, schema = newTaskFormInputSchema as ZodType) => {
       const verification = schema.safeParse(input)
-      const isValid = verification.success
 
-      if (!isValid) {
+      if (!verification.success) {
         setErrors((prev) => ({ ...prev, ...verification.error.format() }))
       } else {
         setErrors((prev) => {
@@ -63,7 +67,7 @@ const NewTaskForm = () => {
         })
       }
 
-      return isValid
+      return verification
     },
     [],
   )
@@ -78,14 +82,28 @@ const NewTaskForm = () => {
   )
 
   const submit: FormEventHandler<HTMLFormElement> = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault()
-      const isValid = validate(value, newTaskFormFieldSchema)
-      if (!isValid) return
+      const verification = newTaskFormOuputSchema.safeParse(value)
+      if (!verification.success) {
+        setErrors(verification.error.format())
+        return
+      }
 
-      console.log('submit')
+      const task = verification.data
+      const action = createTask(task).then((res) => {
+        if (!res.success) {
+          throw res.error
+        }
+      })
+
+      toast.promise(action, {
+        loading: '저장 중...',
+        success: '일정이 저장되었습니다.',
+        error: (message) => message,
+      })
     },
-    [validate, value],
+    [value],
   )
 
   const timeError = useMemo(
@@ -132,7 +150,6 @@ const NewTaskForm = () => {
         <div className="flex gap-2">
           <div>
             <CategorySelect
-              categories={[]}
               value={value?.category}
               onChange={onChange('category')}
               error={_.get(errors, 'category._errors.0')}
@@ -181,12 +198,12 @@ const NewTaskForm = () => {
       </ListItem>
 
       <footer className="mt-8 flex items-center justify-end gap-2">
-        <button
-          type="button"
+        <Link
+          href="/task/new"
           className="rounded bg-white p-2 text-sm text-gray-600 hover:text-gray-800 hover:brightness-95"
         >
           옵션 더보기
-        </button>
+        </Link>
         <button className="rounded bg-blue-600 px-6 py-2 text-sm text-white hover:shadow-md hover:brightness-95">
           저장
         </button>
@@ -195,4 +212,4 @@ const NewTaskForm = () => {
   )
 }
 
-export default NewTaskForm
+export default NewTaskSimpleForm

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 import { isAfter, isSameDay } from 'date-fns'
+import _ from 'lodash'
 
-import { colorSchema } from '@/types/schema'
+import { colorSchema, taskCreateInputSchema } from '@/types/schema'
+import { dateToTimestringForDB } from '@/utils/datetime'
 
 const periodSchema = z
   .object({
@@ -43,14 +45,15 @@ export const newTaskFormFieldSchema = z.object({
 
 export const newTaskFormInputSchema = newTaskFormFieldSchema.partial()
 
-export const newTaskFormPayloadSchema = newTaskFormFieldSchema
-  .partial()
-  .extend({
-    time: z.union([z.object({ start: z.date() }), z.object({ end: z.date() })]),
-  })
+export const newTaskFormOuputSchema = newTaskFormFieldSchema.transform(
+  ({ startDate, time, ...task }) => {
+    const parsedTime = _.mapValues(time, (t) => dateToTimestringForDB(t))
+    return { ...task, repeats: [{ startDate, times: [parsedTime] }] }
+  },
+)
 
 export type PeriodType = z.infer<typeof periodSchema>
 
 export type NewTaskFormPayload = z.infer<typeof newTaskFormInputSchema>
 export type NewTaskFormField = z.input<typeof newTaskFormFieldSchema>
-export type NewTaskFormOutput = z.output<typeof newTaskFormFieldSchema>
+export type NewTaskFormOutput = z.output<typeof newTaskFormOuputSchema>
