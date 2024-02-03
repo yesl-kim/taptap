@@ -8,6 +8,7 @@ import {
   useCallback,
   useMemo,
   forwardRef,
+  use,
 } from 'react'
 import { Combobox } from '@headlessui/react'
 import {
@@ -20,14 +21,13 @@ import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 
 import BasicSelectButton from '@/components/basic-select-button'
-import FieldError from '../field-error'
+import FieldError from '@/components/field-error'
 
 export type Category = {
   title: string
 }
 
 interface Props {
-  categories: Category[]
   onChange: (c: Category) => void
   value?: Category
   error?: string
@@ -35,8 +35,13 @@ interface Props {
 
 const PALCEHOLDER = '카테고리 선택'
 const COMBOBOX_PLACEHOLDER = '카테고리 이름 입력'
+const GET_CATEGORIES = '/api/categories'
+const getCategories: Promise<ApiResponse<Category[]>> = fetch(
+  GET_CATEGORIES,
+).then((res) => res.json())
+
 const CategorySelect = forwardRef<HTMLButtonElement, Props>(
-  ({ categories, value, onChange, error }, buttonRef) => {
+  ({ value, onChange, error }, buttonRef) => {
     const input = useRef<HTMLInputElement>(null)
     const combobox = useRef<HTMLDivElement>(null)
     const { on, turnOff: close, turnOn: open } = useBoolean()
@@ -44,6 +49,10 @@ const CategorySelect = forwardRef<HTMLButtonElement, Props>(
     useOutsideClick({ outsideRef: combobox, action: close })
 
     const [query, setQuery] = useState('')
+    const fetchedCategories = use(getCategories)
+    if (!fetchedCategories.success) throw fetchedCategories.error
+
+    const categories = fetchedCategories.data
     const filteredCategories = useMemo(
       () =>
         !query

@@ -39,8 +39,6 @@ const PeriodFields = ({ name }: Props) => {
     return { start, end }
   }
 
-  console.log('times', values)
-
   return (
     <div className="flex gap-2">
       <div className={'w-[256px]'}>

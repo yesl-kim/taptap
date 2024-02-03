@@ -10,9 +10,6 @@ import { sessionSchema } from '@/types/schema'
 
 import { isPlannedOn } from './task-action.utils'
 
-type SuccessResponse<T> = { success: true; data: T }
-type ErrorResponse = { success: false; error: string }
-type ResponseType<T> = SuccessResponse<T> | ErrorResponse
 export type TaskWithRepeat = Prisma.TaskGetPayload<{
   include: { category: { select: { id: true; title: true } } }
 }> & { repeat: Repeat }
@@ -22,7 +19,7 @@ export const preloadTasksByDate = (unixTime: number) => {
 }
 
 export const getTasksByDate = cache(
-  async (unixTime: number): Promise<ResponseType<TaskWithRepeat[]>> => {
+  async (unixTime: number): Promise<ApiResponse<TaskWithRepeat[]>> => {
     const date = startOfDay(fromUnixTime(unixTime))
 
     try {
@@ -58,5 +55,5 @@ export const getTasksByDate = cache(
         error: 'error',
       }
     }
-  }
+  },
 )

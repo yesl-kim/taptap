@@ -26,16 +26,15 @@ const taskResponseSchema = responseSchema(z.NEVER)
 type TaskResponse = z.infer<typeof taskResponseSchema>
 
 type TaskFormProps = {
-  categories: Category[]
   action: (data: TransformedTaskFrom) => Promise<TaskResponse> // response 타입 통일?
-  task?: TaskFormField
+  task?: Partial<TaskFormField> | null
 }
 
-const TaskForm = ({ categories, action, task }: TaskFormProps) => {
+const TaskForm = ({ action, task }: TaskFormProps) => {
   const { today } = useToday()
+
   const defaultValue = {
     color: defaultColorOptions[0],
-    category: categories[0]?.title,
     repeat: {
       type: repeatTypeValues.Values.None,
       data: {
@@ -78,10 +77,6 @@ const TaskForm = ({ categories, action, task }: TaskFormProps) => {
     // })
   }
 
-  console.log(errors)
-  const title = watch('title')
-  console.log('value', title, typeof title)
-
   return (
     <FormProvider {...context}>
       <form
@@ -107,7 +102,6 @@ const TaskForm = ({ categories, action, task }: TaskFormProps) => {
                   {...field}
                   value={{ title: value }}
                   onChange={(c) => onChange(c.title)}
-                  categories={categories}
                   error={_.get(errors, 'category.message')}
                 />
               )}

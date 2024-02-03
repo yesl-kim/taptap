@@ -6,16 +6,7 @@ import { cache } from 'react'
 
 import { sessionSchema } from '@/types/schema'
 
-export const preloadCategories = () => {
-  void getCategories()
-}
-
-// TODO: 에러를
-// 1. throw
-// 2. 화면에서 받아서 처리 (?)
-// 에러 구분 -> 에러 바운더리로 처리
 export const getCategories = cache(async () => {
-  //   try {
   const {
     user: { email },
   } = sessionSchema.parse(await auth())
@@ -30,5 +21,4 @@ export const getCategories = cache(async () => {
   })
 
   return categories
-  //   } catch (error) {}
 })
