@@ -119,7 +119,12 @@ export const taskFormSchema = z
       .string({ required_error: '제목을 입력해주세요.' })
       .min(1, { message: '제목을 입력해주세요.' }),
     color: colorSchema,
-    category: z.string({ required_error: '카테고리를 선택해주세요.' }),
+    category: z.object(
+      {
+        title: z.string().refine((title) => !!title, { path: ['category'] }),
+      },
+      { required_error: '카테고리를 선택해주세요.' },
+    ),
     repeat: repeatFieldSchema,
   })
   .transform(({ repeat, ...task }) => {
@@ -133,11 +138,8 @@ export const taskFormSchema = z
 
     return { ...task, repeats }
   })
-  .transform(({ repeats, category, ...task }) => ({
+  .transform(({ repeats, ...task }) => ({
     ...task,
-    category: {
-      title: category,
-    },
     repeats: repeats.map(({ times, ...r }) => ({
       ...r,
       times:

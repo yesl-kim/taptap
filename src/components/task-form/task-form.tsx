@@ -63,18 +63,18 @@ const TaskForm = ({ action, task }: TaskFormProps) => {
   } = context
 
   const submit = async (task: TransformedTaskFrom) => {
-    console.log('submit', task, errors)
-    // const promise = action(task).then((res) => {
-    //   if (!res.success) {
-    //     throw res.error
-    //   }
-    // })
+    // console.log('submit', task, errors)
+    const promise = action(task).then((res) => {
+      if (!res.success) {
+        throw res.error
+      }
+    })
 
-    // toast.promise(promise, {
-    //   loading: '저장 중...',
-    //   success: '일정이 저장되었습니다.',
-    //   error: (message) => message,
-    // })
+    toast.promise(promise, {
+      loading: '저장 중...',
+      success: '일정이 저장되었습니다.',
+      error: (message) => message,
+    })
   }
 
   return (
@@ -97,11 +97,9 @@ const TaskForm = ({ action, task }: TaskFormProps) => {
             <Controller
               control={control}
               name="category"
-              render={({ field: { onChange, value, ...field } }) => (
+              render={({ field }) => (
                 <CategorySelect
                   {...field}
-                  value={{ title: value }}
-                  onChange={(c) => onChange(c.title)}
                   error={_.get(errors, 'category.message')}
                 />
               )}

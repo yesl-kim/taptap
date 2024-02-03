@@ -30,7 +30,7 @@ export default function RootLayout({
             </header>
             <div className="flex min-h-[calc(100vh-60px)] gap-1">
               <Sidebar />
-              <div className="flex-1">{children}</div>
+              <div className="flex flex-1">{children}</div>
             </div>
           </div>
         </GlobalProvider>

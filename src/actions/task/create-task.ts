@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma'
 import { ValidationError, fromZodError } from 'zod-validation-error'
 import { z } from 'zod'
 import { startOfDay } from 'date-fns'
+import { revalidatePath } from 'next/cache'
 
 import {
   TaskCreateInput,
@@ -17,7 +18,7 @@ const response = responseSchema(z.NEVER)
 type CreateTaskResponse = z.infer<typeof response>
 
 export const createTask = async (
-  data: TaskCreateInput
+  data: TaskCreateInput,
 ): Promise<CreateTaskResponse> => {
   try {
     const schemaWithAuth = withAuth(taskCreateInputSchema).refine((task) => {
@@ -73,8 +74,8 @@ export const createTask = async (
       },
     })
 
+    revalidatePath('/calendar', 'layout')
     return { success: true }
-    // TODO: revalidate
   } catch (error) {
     console.log('error: ', error)
     if (error instanceof z.ZodError) {
