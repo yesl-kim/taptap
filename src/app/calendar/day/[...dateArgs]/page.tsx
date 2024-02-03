@@ -1,11 +1,10 @@
 import { set, startOfDay } from 'date-fns'
 
 import DailyTaskRecordTimetable from '@/containers/daily-task-record-timetable'
-import NavigationCalendar from '@/containers/navigation-calendar'
-
-import Calendar from '@/components/calendar/calendar'
-
-const today = set(startOfDay(new Date()), { hours: 4 })
+import NavigationCalendar from '@/containers/navigation-calendar/navigation-calendar'
+import CalendarNavigator from '@/containers/navigation-calendar/navigator'
+import NewTaskContextProvider from '@/containers/new-task/new-task-context'
+import NewButton from '@/containers/new-task/new-button'
 
 type Params = {
   params: { dateArgs: string[] }
@@ -21,13 +20,19 @@ export default async function DailySchedulePage({
   // NOTE: assert m = numberlike string
   const monthIndex = +m - 1 ?? 0
   const date = new Date(+y, monthIndex, +d)
-  // console.log(dateArgs)
-  // console.log(date)
 
   return (
-    <main className="flex gap-1 w-full h-full bg-white">
-      <NavigationCalendar />
-      <DailyTaskRecordTimetable date={date} />
-    </main>
+    <>
+      <nav>
+        <CalendarNavigator type="daily" />
+      </nav>
+      <main className="flex flex-1 gap-1 overflow-hidden">
+        <aside>
+          <NewButton />
+          <NavigationCalendar />
+        </aside>
+        <DailyTaskRecordTimetable date={date} />
+      </main>
+    </>
   )
 }

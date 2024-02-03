@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useMemo, useState } from 'react'
 import { useFormContext, Controller } from 'react-hook-form'
-import { addHours, addMinutes, isBefore, isSameMinute } from 'date-fns'
+import { addHours, addMinutes, format, isBefore, isSameMinute } from 'date-fns'
 import _ from 'lodash'
 
 import { round30Minutes } from '@/utils/datetime'
@@ -29,14 +29,6 @@ interface Props {
 }
 
 const PeriodField = ({ range, value, onChange, errors }: Props) => {
-  // const defaultValue = useMemo(() => getDefaultValue(range), [range])
-  // const value = _value ?? defaultValue
-
-  // const [prevRange, setPrevRange] = useState(range)
-  // if (!isSameMinute(prevRange.start, range.start)) {
-  //   trigger(`${name}.start`).finally(() => setPrevRange(range))
-  // }
-
   const endRange = useMemo(
     () =>
       !value ? range : { start: addMinutes(value.start, 1), end: range.end },

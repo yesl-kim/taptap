@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { addHours } from 'date-fns'
+import { addHours, startOfDay, subHours } from 'date-fns'
 
 import useToday from '@/hooks/useToday'
 import { defaultColorOptions } from '@/constants/task.constants'
@@ -29,7 +29,7 @@ const NewTaskContext = createContext<null | NewTaskContextType>(null)
 */
 
 const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
-  const { today } = useToday()
+  const { today, getStartOfDay } = useToday()
   const [task, setTask] = useState<null | NewTaskFormField>(null)
 
   const defaultTask: NewTaskFormField = useMemo(() => {
@@ -53,10 +53,11 @@ const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
         return
       }
 
+      const startDate = startOfDay(subHours(datetime, 4))
       const time = { start: datetime, end: addHours(datetime, 1) }
       setTask({
         ...defaultTask,
-        startDate: datetime,
+        startDate,
         time,
       })
     },

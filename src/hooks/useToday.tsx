@@ -39,15 +39,12 @@ export const TodayContextProvider = ({
   const getStartOfDay = useCallback(
     // 하루의 시작 시간으로 맞춤
     (date: Date) => add(startOfDay(date), { hours: offset }),
-    [offset]
+    [offset],
   )
 
   const getEndOfDay = useCallback(
-    (date: Date) =>
-      add(endOfDay(sub(date, { hours: DEFAULT_OFFSET })), {
-        hours: offset,
-      }),
-    [offset]
+    (date: Date) => add(endOfDay(date), { hours: offset }),
+    [offset],
   )
 
   const [today, setToday] = useState(getStartOfDay(new Date()))
@@ -61,7 +58,7 @@ export const TodayContextProvider = ({
 
   const value = useMemo(
     () => ({ today, getStartOfDay, offset, setOffset, getEndOfDay }),
-    [today, offset, getStartOfDay, getEndOfDay]
+    [today, offset, getStartOfDay, getEndOfDay],
   )
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>

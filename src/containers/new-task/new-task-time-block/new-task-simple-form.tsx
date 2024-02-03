@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react'
 import { ZodType } from 'zod'
-import { addHours } from 'date-fns'
+import { addHours, format } from 'date-fns'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 
@@ -181,8 +181,8 @@ const NewTaskSimpleForm = () => {
               value={value.time}
               onChange={onChange('time')}
               range={{
-                start: getStartOfDay(new Date()),
-                end: getEndOfDay(new Date()),
+                start: getStartOfDay(value.startDate),
+                end: getEndOfDay(value.startDate),
               }}
               errors={timeError}
             />

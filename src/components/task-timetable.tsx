@@ -42,7 +42,6 @@ const TaskTimetable = ({ tasks, date }: Props) => {
       date={date}
       data={data}
       onCreate={(time) => {
-        console.log(time)
         create(time)
       }}
       renderItem={(task) => <TaskTimeBlock task={task} date={date} />}

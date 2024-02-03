@@ -1,7 +1,13 @@
 'use client'
 
 import { addHours, addMinutes } from 'date-fns'
-import React, { MouseEventHandler, ReactNode, useState } from 'react'
+import React, {
+  ForwardedRef,
+  MouseEventHandler,
+  ReactNode,
+  forwardRef,
+  useState,
+} from 'react'
 import { useRouter } from 'next/navigation'
 
 import useToday from '@/hooks/useToday'
@@ -20,10 +26,6 @@ type TimeTableProps<T> = {
   onCreate: (selectedDateTime: Date) => void
 }
 
-/*
- NOTE: params type = taskFormData
- */
-
 const Timetable = <T extends { time: Period }>({
   data,
   date,
@@ -34,29 +36,11 @@ const Timetable = <T extends { time: Period }>({
   const { getStartOfDay } = useToday()
   const [offsetY, setOffsetY] = useState<null | number>(null)
 
-  const router = useRouter()
-
   const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
     const { offsetY } = e.nativeEvent
     const selectedTime = getSelectedTime(offsetY)
     onCreate(selectedTime)
-    // const state = {
-    //   repeats: [
-    //     {
-    //       startDate: date,
-    //       times: [{ start: selectedTime, end: addHours(selectedTime, 1) }],
-    //     },
-    //   ],
-    // }
-    // const params = new URLSearchParams({
-    //   state: encodeURIComponent(JSON.stringify(state)),
-    // })
-    // router.push(`/taskedit?${params.toString()}`)
   }
-
-  // const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
-  //   setOffsetY(e.nativeEvent.offsetY)
-  // }
 
   const getSelectedTime = (offsetY: number) => {
     const duration = heightToDuration(offsetY)
@@ -68,7 +52,10 @@ const Timetable = <T extends { time: Period }>({
     intervalToHeight({ start: getStartOfDay(date), end: time })
 
   return (
-    <div className="relative bg-white" style={{ height: `${TOTAL_HEIGHT}px` }}>
+    <div
+      className="relative overflow-hidden bg-white"
+      style={{ height: `${TOTAL_HEIGHT}px` }}
+    >
       <div className="absolute inset-0" onClick={selectTime} />
 
       <div className="pointer-events-none absolute inset-0">
@@ -85,20 +72,11 @@ const Timetable = <T extends { time: Period }>({
             {renderItem(item)}
           </div>
         ))}
+
         {newBlock}
-        {/* <div
-          data-visible={!!offsetY}
-          className="absolute inset-x-0 top-0 hidden data-[visible=true]:block pointer-events-none"
-          style={{
-            transform: `translateY(${heightFloorToStep(offsetY ?? 0)}px)`,
-          }}
-        >
-          {newBlock(getSelectedTime(offsetY ?? 0))}
-        </div> */}
       </div>
     </div>
   )
 }
 
-Timetable.Grid = TimetableGrid
 export default Timetable

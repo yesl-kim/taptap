@@ -24,21 +24,23 @@ const DailyTaskRecordTimetable = async ({ date }: Props) => {
     !task.repeat.times || isEmpty(task.repeat.times)
   const 기간이없는할일 = tasks.filter(isAllday)
   const 기간이있는할일 = tasks.filter(
-    (t): t is TaskWithRepeatedTimes => !isAllday(t)
+    (t): t is TaskWithRepeatedTimes => !isAllday(t),
   )
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <header>
+    <div className="flex flex-1 flex-col bg-white">
+      <header className="flex flex-col items-start border-b-[1px] border-gray-200">
         <DateHeader date={date} />
-        <div>
+        <div className="mt-1 flex w-full flex-col items-stretch gap-0.5 px-0.5 py-1">
           {기간이없는할일.map((task) => (
             <TaskTimeBlock key={task.id} task={task} date={date} />
           ))}
         </div>
       </header>
-      <main className="flex-1 overflow-scroll">
-        <TaskTimetable tasks={기간이있는할일} date={date} />
+      <main className="relative flex-1">
+        <div className="absolute inset-0 overflow-scroll p-0.5">
+          <TaskTimetable tasks={기간이있는할일} date={date} />
+        </div>
       </main>
     </div>
   )
