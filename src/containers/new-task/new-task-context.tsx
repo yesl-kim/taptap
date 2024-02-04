@@ -4,14 +4,18 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
 import { addHours, startOfDay, subHours } from 'date-fns'
+import { useRouter } from 'next/navigation'
+import _ from 'lodash'
 
 import useToday from '@/hooks/useToday'
 import { defaultColorOptions } from '@/constants/task.constants'
-import { round30Minutes } from '@/utils/datetime'
+import { round30Minutes, setDateTime } from '@/utils/datetime'
+import useNavigateDate from '@/hooks/use-navigate-date/use-navigate-date'
 
 import { NewTaskFormField, NewTaskFormPayload } from './new-task-form.types'
 
@@ -29,7 +33,8 @@ const NewTaskContext = createContext<null | NewTaskContextType>(null)
 */
 
 const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
-  const { today, getStartOfDay } = useToday()
+  const { today } = useToday()
+  const { navigate } = useNavigateDate()
   const [task, setTask] = useState<null | NewTaskFormField>(null)
 
   const defaultTask: NewTaskFormField = useMemo(() => {
@@ -64,7 +69,7 @@ const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
     [defaultTask],
   )
 
-  const update = useCallback(
+  const onChange = useCallback(
     (payload: NewTaskFormPayload) => {
       setTask((prev) => {
         if (!prev) return { ...defaultTask, ...payload }
@@ -72,6 +77,31 @@ const NewTaskContextProvider = ({ children }: PropsWithChildren) => {
       })
     },
     [defaultTask],
+  )
+
+  const onChangeDate = useCallback(
+    (date: Date) => {
+      navigate(date)
+
+      const time = task?.time
+      const newTime =
+        time && _.mapValues(time, (t) => setDateTime({ date, time: t }))
+
+      onChange({ startDate: date, time: newTime })
+    },
+    [navigate, task, onChange],
+  )
+
+  const update = useCallback(
+    (payload: NewTaskFormPayload) => {
+      const { startDate } = payload
+      if (startDate) {
+        onChangeDate(startDate)
+      } else {
+        onChange(payload)
+      }
+    },
+    [onChange, onChangeDate],
   )
 
   const reset = useCallback(() => setTask(null), [])

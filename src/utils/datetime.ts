@@ -4,8 +4,12 @@ import {
   RoundingMethod,
   differenceInMinutes,
   format,
+  getDate,
+  getMonth,
+  getYear,
   parse,
   roundToNearestMinutes,
+  set,
 } from 'date-fns'
 
 import { timestringSchema, Period, PeriodString } from '@/types/schema'
@@ -57,4 +61,15 @@ export const intervalToPercentageOfDay = ({ start, end }: Interval) => {
   const $1DAY_MINUTE = 24 * 60
   const duration = differenceInMinutes(end, start)
   return Math.floor((duration / $1DAY_MINUTE) * 100)
+}
+
+type DateTimePayload = { date: Date; time?: Date } | { date?: Date; time: Date }
+export const setDateTime = ({
+  date: _date = new Date(),
+  time = new Date(),
+}: DateTimePayload) => {
+  const year = getYear(_date),
+    month = getMonth(_date),
+    date = getDate(_date)
+  return set(time, { year, month, date })
 }

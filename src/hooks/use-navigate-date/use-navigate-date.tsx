@@ -5,7 +5,7 @@ import {
   dateParamsSchema,
   dateToParams,
   parmasToDate,
-} from './navigation-calendar.utils'
+} from './use-navigate-date.utils'
 
 const useNavigateDate = () => {
   const router = useRouter()
@@ -16,10 +16,12 @@ const useNavigateDate = () => {
 
   const navigate = useCallback(
     (date: DateType) => {
-      const dateParamsString = dateParamsSchema.parse(params).join('/')
-      router.push(pathname.replace(dateParamsString, dateToParams(date)))
+      const currentParams = dateParamsSchema.parse(params).join('/')
+      const nextParams = dateToParams(date)
+      if (currentParams === nextParams) return
+      router.push(pathname.replace(currentParams, nextParams))
     },
-    [params, pathname, router]
+    [params, pathname, router],
   )
 
   return { navigate, selectedDate }

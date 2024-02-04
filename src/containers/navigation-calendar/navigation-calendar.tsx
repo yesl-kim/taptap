@@ -1,6 +1,6 @@
 'use client'
 
-import useNavigateDate from './use-navigate-date'
+import useNavigateDate from '@/hooks/use-navigate-date/use-navigate-date'
 
 import CalendarNavigator from './navigator'
 import Calendar from '@/components/calendar/calendar'

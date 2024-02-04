@@ -6,7 +6,7 @@ import { memo, useCallback, useMemo } from 'react'
 import { ko } from 'date-fns/locale'
 
 import useToday from '@/hooks/useToday'
-import useNavigateDate from './use-navigate-date'
+import useNavigateDate from '@/hooks/use-navigate-date/use-navigate-date'
 
 import IconButton from '@/components/icon-button'
 import Tooltip from '@/components/tooltip'
@@ -62,21 +62,21 @@ const CalendarNavigator = ({ type }: Props) => {
         },
       },
     }),
-    [selectedDate]
+    [selectedDate],
   )
 
   return (
-    <div className="flex gap-4 items-center">
+    <div className="flex items-center gap-4">
       <Tooltip
         label={format(today, 'M월 dd일 (eeee)', { locale: ko })}
         trigger={
           <button
             type="button"
             onClick={navigateToday}
-            className="bg-white rounded border-[1px] border-gray-200 px-5 py-2 text-sm text-gray-600 hover:brightness-95 focus:brightness-75"
+            className="rounded border-[1px] border-gray-200 bg-white px-5 py-2 text-sm text-gray-600 hover:brightness-95 focus:brightness-75"
           >
             오늘
-            <span className="absolute invisible">로 이동</span>
+            <span className="invisible absolute">로 이동</span>
           </button>
         }
       />
