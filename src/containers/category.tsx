@@ -6,9 +6,10 @@ import { PencilIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { CheckIcon } from '@heroicons/react/24/outline'
 
 import useBoolean from '@/hooks/useBoolean'
+import { deleteCategory } from '@/actions/category/delete-category'
+import { updateCategory } from '@/actions/category/update-category'
 
 import IconButton from '@/components/icon-button'
-import { deleteCategory, updateCategory } from '../actions'
 
 interface Props {
   id: string
@@ -25,7 +26,7 @@ function Category({ id, title }: Props) {
 
   const onDelete = useCallback(async () => {
     const confirmed = confirm(
-      '삭제 후에는 되돌릴 수 없습니다. 정말 삭제하시겠습니까?'
+      '삭제 후에는 되돌릴 수 없습니다. 정말 삭제하시겠습니까?',
     )
     if (!confirmed) return
 
@@ -36,7 +37,7 @@ function Category({ id, title }: Props) {
   }, [id])
 
   return (
-    <form action={update} className="flex gap-4 items-center mb-3">
+    <form action={update} className="mb-3 flex items-center gap-4">
       <IconButton
         type="button"
         label="카테고리 삭제"
@@ -53,12 +54,10 @@ function Category({ id, title }: Props) {
         defaultValue={title}
         onBlur={onBlur}
         onFocus={onFocus}
-        className="outline-none bg-transparent focus:border-b-[1px] border-b-neutral-400"
+        className="border-b-neutral-400 bg-transparent outline-none focus:border-b-[1px]"
       />
       <EditButton {...{ focused, focus }} />
-      <p aria-live="polite" role="status" className="sr-only">
-        {state?.message}
-      </p>
+      <p>{state?.message}</p>
     </form>
   )
 }

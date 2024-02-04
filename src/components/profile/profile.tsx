@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { requestPath } from '@/constants/api'
+
 import Avatar from './avatar'
 
 export default function Profile() {
@@ -21,7 +23,7 @@ export default function Profile() {
         close()
       }
     },
-    [close]
+    [close],
   )
 
   useEffect(() => {
@@ -37,8 +39,8 @@ export default function Profile() {
         <Avatar />
       </button>
       {on && (
-        <div className="absolute right-0 top-full mt-2 shadow-lg rounded-md bg-slate-300 w-[150px] py-2 px-3">
-          <Link href="api/auth/signout">Logout</Link>
+        <div className="absolute right-0 top-full mt-2 w-[150px] rounded-md bg-slate-300 px-3 py-2 shadow-lg">
+          <Link href={requestPath.auth.signout}>Logout</Link>
         </div>
       )}
     </div>

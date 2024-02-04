@@ -19,6 +19,7 @@ import {
 
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
+import { requestPath } from '@/constants/api'
 
 import BasicSelectButton from '@/components/basic-select-button'
 import FieldError from '@/components/field-error'
@@ -37,7 +38,7 @@ const PALCEHOLDER = '카테고리 선택'
 const COMBOBOX_PLACEHOLDER = '카테고리 이름 입력'
 const GET_CATEGORIES = '/api/categories'
 const getCategories: Promise<ApiResponse<Category[]>> = fetch(
-  GET_CATEGORIES,
+  requestPath.categories.get,
 ).then((res) => res.json())
 
 const CategorySelect = forwardRef<HTMLButtonElement, Props>(

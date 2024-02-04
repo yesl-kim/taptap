@@ -10,4 +10,18 @@ module.exports = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/schedule/day',
+        permanent: true,
+      },
+      {
+        source: '/schedule',
+        destination: '/schedule/day',
+        permanent: false,
+      },
+    ]
+  },
 }

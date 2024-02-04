@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation'
 import _ from 'lodash'
 
 import useToday from '@/hooks/useToday'
-import { defaultColorOptions } from '@/constants/task.constants'
+import { defaultColorOptions } from '@/constants/task'
 import { round30Minutes, setDateTime } from '@/utils/datetime'
 import useNavigateDate from '@/hooks/use-navigate-date/use-navigate-date'
 

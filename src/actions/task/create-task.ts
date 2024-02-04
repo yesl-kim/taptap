@@ -13,6 +13,7 @@ import {
   taskSchema,
 } from '@/types/schema'
 import { responseSchema } from '@/types/api'
+import { routes } from '@/constants/routes'
 
 const response = responseSchema(z.NEVER)
 type CreateTaskResponse = z.infer<typeof response>
@@ -74,7 +75,7 @@ export const createTask = async (
       },
     })
 
-    revalidatePath('/calendar', 'layout')
+    revalidatePath(routes.schedule.root, 'layout')
     return { success: true }
   } catch (error) {
     console.log('error: ', error)

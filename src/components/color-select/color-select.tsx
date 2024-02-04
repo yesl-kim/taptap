@@ -12,7 +12,7 @@ import {
 
 import useBoolean from '@/hooks/useBoolean'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
-import { defaultColorOptions } from '@/constants/task.constants'
+import { defaultColorOptions } from '@/constants/task'
 
 import BasicSelectButton from '../basic-select-button'
 import { FOCUSED_ATTR, ITEM_DATA_ATTR, KEY } from './color-select.constants'

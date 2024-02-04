@@ -19,6 +19,7 @@ import useToday from '@/hooks/useToday'
 import { round30Minutes } from '@/utils/datetime'
 import { createTask } from '@/actions/task/create-task'
 import CategorySelect from '@/containers/category-select/category-select'
+import { routes } from '@/constants/routes'
 
 import TextInput from '@/components/text-input'
 import ColorSelect from '@/components/color-select/color-select'
@@ -44,7 +45,7 @@ type Errors = {
 }
 
 const NewTaskSimpleForm = () => {
-  const { update, task: value } = useNewTaskContext()
+  const { update, task: value, reset } = useNewTaskContext()
   const [errors, setErrors] = useState<Partial<Errors>>({})
 
   // TODO
@@ -84,6 +85,7 @@ const NewTaskSimpleForm = () => {
   const submit: FormEventHandler<HTMLFormElement> = useCallback(
     async (e) => {
       e.preventDefault()
+      reset()
       const verification = newTaskFormOuputSchema.safeParse(value)
       if (!verification.success) {
         setErrors(verification.error.format())
@@ -199,7 +201,7 @@ const NewTaskSimpleForm = () => {
 
       <footer className="mt-8 flex items-center justify-end gap-2">
         <Link
-          href="/task/new"
+          href={routes.tasks.new}
           className="rounded bg-white p-2 text-sm text-gray-600 hover:text-gray-800 hover:brightness-95"
         >
           옵션 더보기

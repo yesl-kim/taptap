@@ -9,7 +9,7 @@ import _ from 'lodash'
 
 import { responseSchema } from '@/types/api'
 import useToday from '@/hooks/useToday'
-import { defaultColorOptions } from '@/constants/task.constants'
+import { defaultColorOptions } from '@/constants/task'
 import CategorySelect from '@/containers/category-select/category-select'
 
 import ColorSelect from '../color-select/color-select'

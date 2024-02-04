@@ -6,23 +6,25 @@ import {
   CalendarIcon,
 } from '@heroicons/react/24/outline'
 
+import { routes } from '@/constants/routes'
+
 import NavItem, { NavItemProps } from './nav-item'
 
 const items: NavItemProps[] = [
-  {
-    title: 'Timer',
-    Icon: ClockIcon,
-    href: '/timer',
-  },
+  // {
+  //   title: 'Timer',
+  //   Icon: ClockIcon,
+  //   href: '/timer',
+  // },
   {
     title: 'Time Table',
     Icon: CalendarIcon,
-    href: '/calendar/week',
+    href: routes.schedule.day,
   },
   {
     title: 'Category',
     Icon: ChartBarIcon,
-    href: '/categories',
+    href: routes.categories.root,
   },
 ]
 

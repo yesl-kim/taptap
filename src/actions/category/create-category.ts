@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 
 import { categoryCreateInputSchema } from '@/types/schema'
+import { routes } from '@/constants/routes'
 
 export const createCategory = async (_: any, formData: FormData) => {
   const validatedSchema = withAuth(categoryCreateInputSchema).transform(
@@ -29,7 +30,7 @@ export const createCategory = async (_: any, formData: FormData) => {
       }
 
       return data
-    }
+    },
   )
 
   try {
@@ -48,7 +49,7 @@ export const createCategory = async (_: any, formData: FormData) => {
       },
     })
 
-    revalidatePath('/categories')
+    revalidatePath(routes.categories.root)
     return { ok: true, message: '카테고리가 성공적으로 생성되었습니다.' }
   } catch (e) {
     console.log('error: ', e)
