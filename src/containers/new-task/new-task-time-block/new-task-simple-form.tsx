@@ -4,6 +4,7 @@ import { ListBulletIcon, ClockIcon } from '@heroicons/react/24/outline'
 import _ from 'lodash'
 import {
   FormEventHandler,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -16,7 +17,7 @@ import toast from 'react-hot-toast'
 import Link from 'next/link'
 
 import useToday from '@/hooks/useToday'
-import { round30Minutes } from '@/utils/datetime'
+import { round30Minutes, setDateTime } from '@/utils/datetime'
 import { createTask } from '@/actions/task/create-task'
 import CategorySelect from '@/containers/category-select/category-select'
 import { routes } from '@/constants/routes'
@@ -86,8 +87,10 @@ const NewTaskSimpleForm = () => {
     async (e) => {
       e.preventDefault()
       reset()
+
       const verification = newTaskFormOuputSchema.safeParse(value)
       if (!verification.success) {
+        console.log(verification.error.format())
         setErrors(verification.error.format())
         return
       }
@@ -105,7 +108,7 @@ const NewTaskSimpleForm = () => {
         error: (message) => message,
       })
     },
-    [value],
+    [value, reset],
   )
 
   const timeError = useMemo(
@@ -120,21 +123,20 @@ const NewTaskSimpleForm = () => {
     [errors],
   )
 
-  const isAllday = useMemo(() => !value?.time, [value])
-  const prevTime = useRef<NewTaskFormField['time']>(value?.time)
-  const toggleAllday = () => {
+  const { getStartOfDay, getEndOfDay, today } = useToday()
+
+  const isAllday = useMemo(() => !value?.time, [value?.time])
+  const toggleAllday = useCallback(() => {
     if (!isAllday) {
-      prevTime.current = value?.time
       update({ time: null })
     } else {
-      const start = round30Minutes(new Date())
+      const start = round30Minutes(
+        setDateTime({ date: value?.startDate ?? today, time: new Date() }),
+      )
       const end = addHours(start, 1)
-      const time = prevTime.current ?? { start, end }
-      update({ time })
+      update({ time: { start, end } })
     }
-  }
-
-  const { getStartOfDay, getEndOfDay } = useToday()
+  }, [value?.startDate, update, today, isAllday])
 
   return (
     <form className="flex flex-col bg-white p-2" onSubmit={submit}>
@@ -214,4 +216,4 @@ const NewTaskSimpleForm = () => {
   )
 }
 
-export default NewTaskSimpleForm
+export default memo(NewTaskSimpleForm)

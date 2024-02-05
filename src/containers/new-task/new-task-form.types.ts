@@ -19,12 +19,11 @@ const periodSchema = z
     })
   })
 
-const categorySchema = z.object(
-  {
-    title: z.string(),
-  },
-  { required_error: '카테고리를 선택해주세요' },
-)
+const categorySchema = z
+  .object({
+    title: z.string().min(1),
+  })
+  .refine((c) => !!_.get(c, 'title'), { message: '카테고리를 선택해주세요.' })
 
 export const newTaskFormFieldSchema = z.object({
   title: z
@@ -47,6 +46,9 @@ export const newTaskFormInputSchema = newTaskFormFieldSchema.partial()
 
 export const newTaskFormOuputSchema = newTaskFormFieldSchema.transform(
   ({ startDate, time, ...task }) => {
+    if (!time) {
+      return { ...task, repeats: [{ startDate }] }
+    }
     const parsedTime = _.mapValues(time, (t) => dateToTimestringForDB(t))
     return { ...task, repeats: [{ startDate, times: [parsedTime] }] }
   },

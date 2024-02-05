@@ -32,13 +32,18 @@ const NewTaskTimeBlock = () => {
   const { startDate, time } = task
   if (!time)
     return (
-      <div className="pointer-events-auto z-20 flex brightness-100">
+      <div
+        className="pointer-events-auto z-20 flex brightness-100"
+        ref={refs.setReference}
+      >
         <NewTaskPreview />
-        <div className="absolute">
-          <PopoverPanelLayout close={reset}>
-            <NewTaskForm />
-          </PopoverPanelLayout>
-        </div>
+        <Portal>
+          <div ref={refs.setFloating} style={floatingStyles}>
+            <PopoverPanelLayout close={reset}>
+              <NewTaskForm />
+            </PopoverPanelLayout>
+          </div>
+        </Portal>
       </div>
     )
 
@@ -48,7 +53,6 @@ const NewTaskTimeBlock = () => {
   })
 
   const height = intervalToPercentageOfDay(time)
-  console.log(height)
 
   return (
     <div

@@ -3,6 +3,7 @@
 import { Repeat, Task } from '@prisma/client'
 import { Interval, format, isSameDay } from 'date-fns'
 import { z } from 'zod'
+import _ from 'lodash'
 
 import { TaskWithRepeat } from '@/actions/task/get-tasks'
 import TaskTimeBlock from '@/containers/task-time-block/task-time-block'
@@ -15,7 +16,7 @@ import {
 } from '@/types/schema'
 import { useNewTaskContext } from '@/containers/new-task/new-task-context'
 import NewTaskTimeBlock from '@/containers/new-task/new-task-time-block/new-task-time-block'
-import { periodStringToInterval, timestringForDBToDate } from '@/utils/datetime'
+import { periodStringToInterval } from '@/utils/datetime'
 
 import Timetable from './time-table/timetable'
 
@@ -35,7 +36,8 @@ const TaskTimetable = ({ tasks, date }: Props) => {
   const { task: newTask, create } = useNewTaskContext()
   const data = tasks.flatMap((task) => parse(task, date))
 
-  const hasNewTask = newTask && isSameDay(newTask.startDate, date)
+  const hasNewTask =
+    newTask && isSameDay(newTask.startDate, date) && !_.isEmpty(newTask.time)
 
   return (
     <Timetable

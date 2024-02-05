@@ -36,9 +36,8 @@ interface Props {
 
 const PALCEHOLDER = '카테고리 선택'
 const COMBOBOX_PLACEHOLDER = '카테고리 이름 입력'
-const GET_CATEGORIES = '/api/categories'
 const getCategories: Promise<ApiResponse<Category[]>> = fetch(
-  requestPath.categories.get,
+  `http://localhost:3000${requestPath.categories}`,
 ).then((res) => res.json())
 
 const CategorySelect = forwardRef<HTMLButtonElement, Props>(

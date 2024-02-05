@@ -31,7 +31,7 @@ export const parmasToDate = (params: any) => {
     const date = new Date(+y, monthIndex, +d)
 
     return z.date().parse(date)
-  } catch (e) {
+  } catch {
     return
   }
 }

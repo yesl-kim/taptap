@@ -1,12 +1,10 @@
 'use client'
 
-import { intervalToPercentageOfDay, intervalToString } from '@/utils/datetime'
-import useToday from '@/hooks/useToday'
+import { intervalToString } from '@/utils/datetime'
 
 import { useNewTaskContext } from '../new-task-context'
 
 const NewTaskPreview = () => {
-  const { getStartOfDay } = useToday()
   const { task } = useNewTaskContext()
   if (!task) return null // ??
 
