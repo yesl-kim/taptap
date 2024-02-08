@@ -53,7 +53,7 @@ const Timetable = <T extends { time: Period }>({
 
   return (
     <div
-      className="relative overflow-hidden bg-white"
+      className="relative overflow-hidden border-l-[1px] border-gray-200"
       style={{ height: `${TOTAL_HEIGHT}px` }}
     >
       <div className="absolute inset-0" onClick={selectTime} />

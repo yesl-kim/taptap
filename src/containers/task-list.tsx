@@ -24,7 +24,7 @@ const TaskList = ({ date, tasks }: Props) => {
     newTask && !newTask.time && isSameDay(newTask.startDate, date)
 
   return (
-    <div className="flex w-full flex-col items-stretch gap-0.5 px-0.5 py-1">
+    <div className="flex w-full flex-col items-stretch gap-0.5 px-0.5 py-0.5">
       {tasks.map((task) => (
         <TaskTimeBlock key={task.id} task={task} date={date} />
       ))}
