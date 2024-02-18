@@ -9,7 +9,7 @@ const BasicSelectButton = forwardRef<HTMLButtonElement, Props>(
   ({ active = false, children, ...props }, ref) => (
     <button
       ref={ref}
-      className="flex gap-6 items-center p-2 rounded hover:bg-neutral-100 focus:bg-neutral-200 transition focus:outline-none outline-none text-sm text-gray-900"
+      className="flex items-center gap-6 rounded p-2 text-sm text-gray-600 outline-none transition hover:bg-neutral-100 focus:bg-neutral-200 focus:outline-none"
       {...props}
     >
       {children}
@@ -20,7 +20,7 @@ const BasicSelectButton = forwardRef<HTMLButtonElement, Props>(
         strokeWidth={3}
       />
     </button>
-  )
+  ),
 )
 
 BasicSelectButton.displayName = 'BasicSelectButton'

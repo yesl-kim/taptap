@@ -5,16 +5,12 @@ import { getDay, format, startOfWeek, addDays, isSameDay } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
 interface Props {
-  base?: Date // base를 포함하는 주간을 렌더
+  base: Date // base를 포함하는 주간을 렌더
   selectedDays: Date[]
   onClickDay: (day: Date) => void
 }
 
-const DayOfWeekSelect = ({
-  base = new Date(),
-  selectedDays,
-  onClickDay,
-}: Props) => {
+const DayOfWeekSelect = ({ base, selectedDays, onClickDay }: Props) => {
   const weekdays = useMemo(() => getWeekdays(base), [base])
   const isActive = useCallback(
     (day: Date) => selectedDays.some((d) => isSameDay(d, day)),

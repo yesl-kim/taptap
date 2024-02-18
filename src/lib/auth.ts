@@ -33,10 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(config)
 
 export const withAuth = <T>(schema: z.ZodType<T>) =>
   schema.transform(async (data, ctx) => {
-    const s = await auth()
     const session = sessionSchema.safeParse(await auth())
-    console.log('session', s)
-    console.log('parsed session', session)
     if (!session.success) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

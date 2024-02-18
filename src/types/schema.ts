@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { z } from 'zod'
 
 export const model = z.object({
@@ -21,22 +20,37 @@ export const userSchema = model.extend({
   email: z.string(),
 })
 
+// scalar =======================================
+export const colorSchema = z
+  .string({ required_error: '색상을 선택해주세요.' })
+  .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+    message: '올바른 색상 코드를 입력해주세요.',
+  })
+
 // repeat =========================================
-const timeSchema = z.string().regex(/^([01][0-9])|(2[0-4]):([0-5][0-9])$/) // hh:mm
+export const timestringSchema = z
+  .string()
+  .regex(/^([01][0-9])|(2[0-4]):([0-5][0-9])$/) // HH:mm
+// export const dateSchema = z.date()
+export const dateSchema = z.union([z.date(), z.string().datetime()])
 
 export const periodStringSchema = z.object({
-  start: timeSchema,
-  end: timeSchema,
+  start: timestringSchema,
+  end: timestringSchema,
 })
+
+export type PeriodString = z.infer<typeof periodStringSchema>
 
 export const periodDateSchema = z.object({
-  start: z.date(),
-  end: z.date(),
+  start: dateSchema,
+  end: dateSchema,
 })
 
+export type Period = z.infer<typeof periodDateSchema>
+
 export const repeatSchema = model.extend({
-  startDate: z.date(),
-  endDate: z.optional(z.date()),
+  startDate: dateSchema,
+  endDate: z.optional(dateSchema),
   times: z.optional(z.array(periodStringSchema)),
   type: z.optional(z.enum(['Daily', 'Weekly', 'Monthly', 'Yearly'])),
   interval: z.optional(z.number().int().positive()),
@@ -58,6 +72,8 @@ export const repeatCreateInputSchema = repeatSchema
     daysOfWeek: true,
   })
 
+export type Repeat = z.infer<typeof repeatSchema>
+
 // category =========================================
 export const categorySchema = model.extend({
   title: z.string({ required_error: '필수값입니다.' }).min(1),
@@ -75,7 +91,7 @@ export const categoryUpdateInputSchema = categorySchema.pick({
 // task =========================================
 // TODO: add records type
 export const taskSchema = model.extend({
-  title: z.string({ required_error: '필수값입니다.' }).min(1),
+  title: z.string({ required_error: '필수값입니다.' }),
   color: z.string(),
   repeats: z.array(repeatSchema),
   categoryId: z.string().cuid(),
@@ -93,5 +109,7 @@ export const taskCreateInputSchema = taskSchema
     repeats: z.array(repeatCreateInputSchema),
     category: categoryCreateInputSchema,
   })
+
+export type Task = z.infer<typeof taskSchema>
 
 export type TaskCreateInput = z.infer<typeof taskCreateInputSchema>

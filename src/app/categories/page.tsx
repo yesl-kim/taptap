@@ -1,7 +1,6 @@
-import { getCategories } from '@/actions/get-categories'
-
-import Category from './components/category'
-import NewCategory from './components/new-category'
+import { getCategories } from '@/actions/category/get-categories'
+import Category from '@/containers/category'
+import NewCategory from '@/containers/new-category'
 
 // TODO: 카테고리 없을 때
 export default async function CategoriesPage() {

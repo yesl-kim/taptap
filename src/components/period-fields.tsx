@@ -1,26 +1,23 @@
 'use client'
 
-import { addHours, endOfDay, startOfDay } from 'date-fns'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { addHours } from 'date-fns'
+import { useFieldArray, useFormContext, Controller } from 'react-hook-form'
 import { PlusCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { round30Minutes } from '@/utils/datetime'
 import useToday from '@/hooks/useToday'
 import { isEmpty } from '@/utils/validator'
 
-import PeriodField, { PeriodData } from '@/components/period-field'
+import PeriodField, { Period as PeriodType } from '@/components/period-field'
 import IconButton from './icon-button'
 
 interface Props {
   name: string
 }
 
-// TODO: getStartOfDay(date) -> date = <선택된 날짜> | <오늘>
-// => 선택된 날짜 기준으로 받을 수 있도록
-// TODO: style
 const PeriodFields = ({ name }: Props) => {
   const { control, watch } = useFormContext()
-  const values: PeriodData[] = watch(name, [])
+  const values: PeriodType[] = watch(name, [])
   const { fields, append, remove } = useFieldArray({
     control,
     name,
@@ -46,23 +43,33 @@ const PeriodFields = ({ name }: Props) => {
     <div className="flex gap-2">
       <div className={'w-[256px]'}>
         {isEmpty(fields) ? (
-          <p className="h-[40px] px-2 leading-[40px] text-sm text-gray-500">
+          <p className="h-[40px] px-2 text-sm leading-[40px] text-gray-500">
             기간 설정 안함
           </p>
         ) : (
-          fields.map((field, idx) => (
-            <div key={field.id} className="flex gap-2 items-center">
-              <PeriodField name={`${name}.${idx}`} range={getRange(idx)} />
+          fields.map((field, i) => (
+            <div key={field.id} className="flex items-center gap-2">
+              <Controller
+                control={control}
+                name={`${name}.${i}`}
+                render={({ field: { value: period, onChange } }) => (
+                  <PeriodField
+                    range={getRange(i)}
+                    value={period}
+                    onChange={onChange}
+                  />
+                )}
+              />
               <IconButton
                 Icon={XMarkIcon}
                 label="기간 삭제"
-                onClick={() => remove(idx)}
+                onClick={() => remove(i)}
               />
             </div>
           ))
         )}
       </div>
-      <div className="h-[40px] flex items-center">
+      <div className="flex h-[40px] items-center">
         <IconButton
           Icon={PlusCircleIcon}
           label="이 요일에 기간 추가"
