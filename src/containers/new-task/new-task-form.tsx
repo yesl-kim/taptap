@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { unknown } from 'zod'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
 import { createTask } from '@/actions/task/create-task'
@@ -10,11 +9,11 @@ import TaskForm from '@/components/task-form/task-form'
 import { useNewTaskContext } from './new-task-context'
 import { NewTaskFormField } from './new-task-form.types'
 import {
+  TaskFormField,
   TransformedTaskFrom,
   repeatTypeValues,
 } from '@/components/task-form/task-form.types'
 import IconButton from '@/components/icon-button'
-import Modal from '@/components/modal'
 
 const transform = (task: NewTaskFormField | null) => {
   if (!task) return
@@ -31,7 +30,7 @@ const transform = (task: NewTaskFormField | null) => {
 
 const NewTaskForm = () => {
   const { task, reset } = useNewTaskContext()
-  const taskInput = transform(task)
+  const taskInput = transform(task) as Partial<TaskFormField>
 
   const router = useRouter()
   const action = async (data: TransformedTaskFrom) => {

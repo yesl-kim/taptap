@@ -22,12 +22,9 @@ import {
 } from './task-form.types'
 import TextInput from '../text-input'
 
-const taskResponseSchema = responseSchema(z.NEVER)
-type TaskResponse = z.infer<typeof taskResponseSchema>
-
 type TaskFormProps = {
-  action: (data: TransformedTaskFrom) => Promise<TaskResponse> // response 타입 통일?
-  task?: Partial<TaskFormField> | null
+  action: (data: TransformedTaskFrom) => Promise<ApiResponse<any>> // response 타입 통일?
+  task?: Partial<TaskFormField>
 }
 
 const TaskForm = ({ action, task }: TaskFormProps) => {

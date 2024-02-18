@@ -37,11 +37,14 @@ interface Props {
 const PALCEHOLDER = '카테고리 선택'
 const COMBOBOX_PLACEHOLDER = '카테고리 이름 입력'
 const getCategories: Promise<ApiResponse<Category[]>> = fetch(
-  `http://localhost:3000${requestPath.categories}`,
-).then((res) => res.json())
+  `${process.env.NEXT_PUBLIC_HOST}${requestPath.categories}`,
+)
+  .then((res) => res.json())
+  .catch((err) => console.log('error in get categories function: ', err))
 
 const CategorySelect = forwardRef<HTMLButtonElement, Props>(
   ({ value, onChange, error }, buttonRef) => {
+    console.log('host: ', process.env.NEXT_PUBLIC_HOST)
     const input = useRef<HTMLInputElement>(null)
     const combobox = useRef<HTMLDivElement>(null)
     const { on, turnOff: close, turnOn: open } = useBoolean()

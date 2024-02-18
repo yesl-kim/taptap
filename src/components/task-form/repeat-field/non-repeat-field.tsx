@@ -34,7 +34,7 @@ const NonRepeatField = () => {
   })
 
   const values = watch(name)
-  const repeatFields = fields.map((field, i) => ({ ...field, ...values[i] }))
+  const repeatFields = fields.map((field, i) => ({ ...field, ...values![i] }))
 
   useEffect(() => {
     trigger(name)

@@ -2,25 +2,16 @@
 
 import { withAuth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { ValidationError, fromZodError } from 'zod-validation-error'
 import { z } from 'zod'
 import { startOfDay } from 'date-fns'
 import { revalidatePath } from 'next/cache'
 
-import {
-  TaskCreateInput,
-  taskCreateInputSchema,
-  taskSchema,
-} from '@/types/schema'
-import { responseSchema } from '@/types/api'
+import { TaskCreateInput, taskCreateInputSchema } from '@/types/schema'
 import { routes } from '@/constants/routes'
-
-const response = responseSchema(z.NEVER)
-type CreateTaskResponse = z.infer<typeof response>
 
 export const createTask = async (
   data: TaskCreateInput,
-): Promise<CreateTaskResponse> => {
+): Promise<ApiResponse<null>> => {
   try {
     const schemaWithAuth = withAuth(taskCreateInputSchema).refine((task) => {
       const repeats = task.repeats.map((r) => ({
@@ -76,9 +67,8 @@ export const createTask = async (
     })
 
     revalidatePath(routes.schedule.root, 'layout')
-    return { success: true }
+    return { success: true, data: null }
   } catch (error) {
-    console.log('error: ', error)
     if (error instanceof z.ZodError) {
       return { success: false, error: '입력값을 확인해주세요.' }
     }

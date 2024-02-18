@@ -8,18 +8,10 @@ import { Square2StackIcon } from '@heroicons/react/24/outline'
 import useToday from '@/hooks/useToday'
 
 import PeriodFields from '@/components/period-fields'
-import { PeriodData } from '@/components/period-field'
 import DayOfWeekSelect from './day-of-week-select'
 import EndDateField from './end-date-field'
 import { PeriodType } from '../task-form.types'
 import IconButton from '@/components/icon-button'
-
-export type RepeatFormData = {
-  startDate: Date
-  times: PeriodData[]
-  daysOfMonth?: number[]
-  endDate?: Date
-}
 
 // name = 'repeat'
 const WeeklyRepeatField = () => {

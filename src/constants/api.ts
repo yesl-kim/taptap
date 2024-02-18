@@ -2,7 +2,6 @@ export const requestPath = {
   auth: {
     signout: '/api/auth/signout',
   },
-  categories: {
-    get: '/api/categories',
-  },
+  categories: '/api/categories',
+  tasks: '/api/tasks',
 }
