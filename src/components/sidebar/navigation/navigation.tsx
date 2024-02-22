@@ -17,23 +17,23 @@ const items: NavItemProps[] = [
   //   href: '/timer',
   // },
   {
-    title: 'Time Table',
+    title: '시간표',
     Icon: CalendarIcon,
     href: routes.schedule.day,
   },
   {
-    title: 'Category',
+    title: '카테고리',
     Icon: ChartBarIcon,
     href: routes.categories.root,
   },
 ]
 
-export default function Navigation() {
-  return (
-    <nav>
-      {items.map((props) => (
-        <NavItem key={props.href} {...props} />
-      ))}
-    </nav>
-  )
-}
+const Navigation = () => (
+  <nav className="flex flex-col gap-2">
+    {items.map((props) => (
+      <NavItem key={props.href} {...props} />
+    ))}
+  </nav>
+)
+
+export default Navigation

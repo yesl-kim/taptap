@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useCallback } from 'react'
 
 import { createTask } from '@/actions/task/create-task'
 
@@ -39,12 +40,17 @@ const NewTaskForm = () => {
     return await createTask(data)
   }
 
+  const goBack = useCallback(() => {
+    reset()
+    router.back()
+  }, [router, reset])
+
   return (
     <section className="relative bg-white py-6 pr-4">
       <TaskForm action={action} task={taskInput} />
 
       <aside className="absolute left-0 top-0 w-[max-content] p-2">
-        <IconButton Icon={XMarkIcon} label="닫기" onClick={router.back} />
+        <IconButton Icon={XMarkIcon} label="닫기" onClick={goBack} />
       </aside>
     </section>
   )

@@ -1,14 +1,7 @@
 'use client'
 
-import { addHours, addMinutes } from 'date-fns'
-import React, {
-  ForwardedRef,
-  MouseEventHandler,
-  ReactNode,
-  forwardRef,
-  useState,
-} from 'react'
-import { useRouter } from 'next/navigation'
+import { addMinutes } from 'date-fns'
+import React, { MouseEventHandler, ReactNode } from 'react'
 
 import useToday from '@/hooks/useToday'
 import { round30Minutes } from '@/utils/datetime'
@@ -16,7 +9,6 @@ import { Period } from '@/types/schema'
 
 import { HEIGHT_PER_STEP, TOTAL_HEIGHT } from './timetable.constants'
 import { heightToDuration, intervalToHeight } from './timetable.utils'
-import TimetableGrid from './timetable-grid'
 
 type TimeTableProps<T> = {
   date: Date
@@ -34,7 +26,6 @@ const Timetable = <T extends { time: Period }>({
   onCreate,
 }: TimeTableProps<T>) => {
   const { getStartOfDay } = useToday()
-  const [offsetY, setOffsetY] = useState<null | number>(null)
 
   const selectTime: MouseEventHandler<HTMLDivElement> = (e) => {
     const { offsetY } = e.nativeEvent
