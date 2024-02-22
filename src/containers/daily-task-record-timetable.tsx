@@ -10,6 +10,7 @@ import TaskTimetable, {
 import DateHeader from '@/components/date-header'
 import TaskList from './task-list'
 import TimetableGrid from '@/components/time-table/timetable-grid'
+import TimetableContainer from '@/components/time-table/timetable-container'
 
 type TaskWithoutTimes = TaskWithRepeat & {
   repeat: Repeat & { times?: null | [] }
@@ -40,14 +41,13 @@ const DailyTaskRecordTimetable = async ({ date }: Props) => {
         <div className="border-l-[1px] border-gray-200">
           <TaskList date={date} tasks={기간이없는할일} />
         </div>
-        <div className="h-[1px] w-full shadow-[0px_1px_5px_1px_rgba(0,0,0,0.3)]" />
       </header>
 
-      <div className="relative flex-1">
-        <div className="absolute inset-0 overflow-scroll pl-20">
+      <div className="flex-1">
+        <TimetableContainer>
           <TimetableGrid />
           <TaskTimetable tasks={기간이있는할일} date={date} />
-        </div>
+        </TimetableContainer>
       </div>
     </section>
   )
