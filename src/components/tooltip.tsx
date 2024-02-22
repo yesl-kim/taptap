@@ -1,3 +1,7 @@
+'use client'
+
+import { useId, useRef } from 'react'
+
 import { generateGuid } from '@/utils/parser'
 
 type Props = {
@@ -6,7 +10,8 @@ type Props = {
 }
 
 const Tooltip = ({ label, trigger }: Props) => {
-  const id = generateGuid()
+  const id = useId()
+
   return (
     <div className="relative">
       <div className="peer" aria-describedby={id}>
@@ -15,7 +20,7 @@ const Tooltip = ({ label, trigger }: Props) => {
       <p
         id={id}
         role="tooltip"
-        className="absolute left-[50%] top-[100%] -translate-x-[50%] w-auto mt-1 z-10 bg-black/70 py-1 px-2 rounded-md text-white text-xs whitespace-nowrap invisible peer-hover:visible peer-focus-within:visible"
+        className="invisible absolute left-[50%] top-[100%] z-10 mt-1 w-auto -translate-x-[50%] whitespace-nowrap rounded-md bg-black/70 px-2 py-1 text-xs text-white peer-focus-within:visible peer-hover:visible"
       >
         {label}
       </p>
