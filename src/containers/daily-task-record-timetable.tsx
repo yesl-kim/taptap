@@ -36,8 +36,10 @@ const DailyTaskRecordTimetable = async ({ date }: Props) => {
 
   return (
     <section className="flex flex-1 flex-col bg-white">
-      <header className="flex flex-col items-start gap-1 pl-20">
-        <DateHeader date={date} />
+      <header className="flex flex-col items-stretch gap-1 pl-20">
+        <div className="self-start">
+          <DateHeader date={date} />
+        </div>
         <div className="border-l-[1px] border-gray-200">
           <TaskList date={date} tasks={기간이없는할일} />
         </div>

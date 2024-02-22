@@ -86,7 +86,6 @@ const NewTaskSimpleForm = () => {
   const submit: FormEventHandler<HTMLFormElement> = useCallback(
     async (e) => {
       e.preventDefault()
-      reset()
 
       const verification = newTaskFormOuputSchema.safeParse(value)
       if (!verification.success) {
@@ -107,6 +106,7 @@ const NewTaskSimpleForm = () => {
         success: '일정이 저장되었습니다.',
         error: (message) => message,
       })
+      reset()
     },
     [value, reset],
   )

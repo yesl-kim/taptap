@@ -40,7 +40,7 @@ const TaskTimeBlock = ({ task, date }: TaskTimeBlockProps) => {
   ]
 
   return (
-    <Popover className="relative">
+    <Popover className="relative w-full">
       <Popover.Button
         className="flex w-full overflow-hidden text-ellipsis whitespace-nowrap break-words rounded px-1.5 py-0.5 text-sm text-white opacity-50"
         style={{ backgroundColor: color }}
