@@ -44,7 +44,6 @@ const getCategories: Promise<ApiResponse<Category[]>> = fetch(
 
 const CategorySelect = forwardRef<HTMLButtonElement, Props>(
   ({ value, onChange, error }, buttonRef) => {
-    console.log('host: ', process.env.NEXT_PUBLIC_HOST)
     const input = useRef<HTMLInputElement>(null)
     const combobox = useRef<HTMLDivElement>(null)
     const { on, turnOff: close, turnOn: open } = useBoolean()
